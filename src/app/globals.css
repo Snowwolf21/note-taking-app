@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #0f172a;
+    --bg-surface: #1e293b;
+    --bg-surface-hover: #334155;
+    --bg-card: #1e293b;
+    --bg-card-selected: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --primary: #06b6d4;
+    --primary-hover: #0891b2;
+    --primary-contrast: #0f172a;
+    --accent: #8b5cf6;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+
+    --font-family-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+    --font-family-serif: var(--font-serif), Georgia, serif;
+    --font-family-mono: var(--font-mono), monospace;
+
+    --font-family-active: var(--font-family-sans);
+  }
+
+  /* Color Theme Overrides */
+  html[data-theme="light"] {
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-hover: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-card-selected: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --primary-contrast: #ffffff;
+    --accent: #7c3aed;
+  }
+
+  html[data-theme="sepia"] {
+    --bg-main: #fbf7ee;
+    --bg-surface: #f4efe6;
+    --bg-surface-hover: #ebe3d5;
+    --bg-card: #f4efe6;
+    --bg-card-selected: #ebe3d5;
+    --text-main: #431407;
+    --text-muted: #78350f;
+    --border-color: #d6cebe;
+    --primary: #c2410c;
+    --primary-hover: #9a3412;
+    --primary-contrast: #ffffff;
+    --accent: #b45309;
+  }
+
+  html[data-theme="slate"] {
+    --bg-main: #181e29;
+    --bg-surface: #242d3d;
+    --bg-surface-hover: #313c50;
+    --bg-card: #242d3d;
+    --bg-card-selected: #313c50;
+    --text-main: #e2e8f0;
+    --text-muted: #8a99ad;
+    --border-color: #313c50;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-contrast: #ffffff;
+    --accent: #6366f1;
+  }
+
+  /* Font Theme Overrides */
+  html[data-font="sans"] {
+    --font-family-active: var(--font-family-sans);
+  }
+
+  html[data-font="serif"] {
+    --font-family-active: var(--font-family-serif);
+  }
+
+  html[data-font="mono"] {
+    --font-family-active: var(--font-family-mono);
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Focus Ring Utility */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-main)];
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "note_1786990371966_i2sih",
+    "userId": null,
+    "title": "My New Shortcut Note",
+    "content": "This is a note created completely using keyboard shortcuts to verify the note creation flow.\n- Command+N or Ctrl+N to create a note.\n- Command+S or Ctrl+S to save the note.",
+    "tags": "[\"Shortcuts\"]",
+    "isArchived": false,
+    "createdAt": "2026-08-17T18:12:51.966Z",
+    "updatedAt": "2026-08-17T18:12:51.966Z"
+  },
+  {
+    "id": "note_1786989615492_vefzt",
+    "userId": null,
+    "title": "Keyboard Shortcuts & Markdown Test",
+    "content": "# Markdown Test Note\n\nThis is a test of the editor. Here's a list of features:\n- **Bold text**\n- *Italic text*\n- `Inline code`\n\n## Sub-header\nHere is some code:\n```javascript\nconst greet = () => console.log(\"Hello, world!\");\n```",
+    "tags": "[]",
+    "isArchived": false,
+    "createdAt": "2026-08-17T18:00:15.492Z",
+    "updatedAt": "2026-08-17T18:00:15.492Z"
+  },
+  {
+    "id": "note_1786988589954_7r65k",
+    "userId": null,
+    "title": "Frontend Mentor Challenge Checklist",
+    "content": "Comprehensive checklist for the note-taking web app challenge:\n\n* [x] Create, read, update, and delete notes\n* [x] Archive notes\n* [x] View all notes & view archived notes\n* [x] View notes with specific tags\n* [x] Search notes by title, tag, and content\n* [x] Select color theme (Light, Dark, Sepia, Slate)\n* [x] Select font theme (Sans-serif, Serif, Monospace)\n* [x] Form validation error states & messages\n* [x] 100% Keyboard navigation & focus rings\n* [x] Responsive layout (Mobile, Tablet, Desktop)\n* [x] Save details to SQLite database\n* [x] User authentication (Register, Login, Password Reset)",
+    "tags": "[\"Dev\",\"A11y\",\"Checklist\"]",
+    "isArchived": true,
+    "createdAt": "2026-08-17T17:43:09.954Z",
+    "updatedAt": "2026-08-17T17:43:09.954Z"
+  },
+  {
+    "id": "note_1786988589953_fljp1",
+    "userId": null,
+    "title": "Idea: AI Voice-to-Text Memos",
+    "content": "Brainstorming session for voice note integration:\n- Record short 30-second audio clips using the browser MediaRecorder API.\n- Send payload to Gemini API for instant transcription and automatic tag generation.\n- Save summary directly into Inkwell notes workspace!",
+    "tags": "[\"Ideas\",\"Personal\",\"AI\"]",
+    "isArchived": false,
+    "createdAt": "2026-08-17T17:43:09.953Z",
+    "updatedAt": "2026-08-17T17:43:09.953Z"
+  },
+  {
+    "id": "note_1786988589952_kjow3",
+    "userId": null,
+    "title": "React 19 & Server Components Architecture",
+    "content": "React Server Components (RSC) allow components to render on the server and stream to the browser.\n\n### Key Benefits:\n- **Zero Bundle Size**: Server components do not ship JS code to client browsers.\n- **Direct Database Access**: Fetch data right inside async server components.\n- **Automatic Code Splitting**: Client components imported inside server components are split into small lazy chunks.\n\n```tsx\nexport async function NotesList() {\n  const notes = await db.note.findMany();\n  return <ul role=\"list\">{notes.map(n => <li key={n.id}>{n.title}</li>)}</ul>;\n}\n```",
+    "tags": "[\"React\",\"Architecture\",\"Dev\"]",
+    "isArchived": false,
+    "createdAt": "2026-08-17T17:43:09.953Z",
+    "updatedAt": "2026-08-17T18:33:14.484Z"
+  }
+]
