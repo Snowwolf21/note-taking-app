@@ -29,7 +29,7 @@ export async function signToken(payload: { userId: string; email: string }): Pro
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('1d')
     .sign(JWT_SECRET);
 }
 
@@ -49,7 +49,7 @@ export async function setAuthCookie(token: string) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 1, // 1 day
   });
 }
 

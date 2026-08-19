@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable} ${firaCode.variable}`}>
-      <body className="antialiased min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-[var(--font-family-active)] transition-colors duration-200">
+      <body className="antialiased min-h-screen bg-(--bg-main) text-(--text-main) font-(--font-family-active) transition-colors duration-200">
         {children}
       </body>
     </html>

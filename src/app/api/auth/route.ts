@@ -174,7 +174,7 @@ export async function POST(req: Request) {
       }
 
       const token = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit PIN code for easy testing
-      const expiresAt = new Date(Date.now() + 1000 * 60 * 30); // 30 minutes
+      const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
 
       await db.passwordResetToken.create({
         data: {

@@ -77,6 +77,7 @@ export const db = {
       if (!where) return notes.length;
       return notes.filter((n: any) => (where.userId === null ? n.userId === null : n.userId === where.userId)).length;
     },
+    
     findMany: async ({ where, orderBy }: { where?: any; orderBy?: any } = {}) => {
       let notes = readJSON<any>(NOTES_FILE);
       if (where) {
