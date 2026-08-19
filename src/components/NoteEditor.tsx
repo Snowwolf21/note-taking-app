@@ -151,13 +151,13 @@ export function NoteEditor({
 
   if (!note && !isNewNoteMode) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[var(--bg-main)] text-[var(--text-muted)] space-y-3">
-        <div className="p-4 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm">
-          <Edit3 className="w-10 h-10 text-[var(--primary)] mx-auto opacity-50" />
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-(--bg-main) text-(--text-muted) space-y-3">
+        <div className="p-4 bg-(--bg-surface) rounded-2xl border border-(--border-color) shadow-sm">
+          <Edit3 className="w-10 h-10 text-(--primary) mx-auto opacity-50" />
         </div>
-        <h3 className="text-lg font-bold text-[var(--text-main)]">No Note Selected</h3>
+        <h3 className="text-lg font-bold text-(--text-main)">No Note Selected</h3>
         <p className="text-sm max-w-sm">
-          Select a note from the left directory list or click <strong className="text-[var(--primary)]">Create New Note</strong> to start editing.
+          Select a note from the left directory list or click <strong className="text-(--primary)">Create New Note</strong> to start editing.
         </p>
       </div>
     );
@@ -167,26 +167,26 @@ export function NoteEditor({
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[var(--bg-main)] overflow-hidden" aria-label="Note Editor View">
+    <div className="flex-1 flex flex-col h-full bg-(--bg-main) overflow-hidden" aria-label="Note Editor View">
       {/* Top Action Bar */}
-      <div className="px-4 py-3 bg-[var(--bg-surface)] border-b border-[var(--border-color)] flex items-center justify-between gap-3 shrink-0 flex-wrap">
+      <div className="px-4 py-3 bg-(--bg-surface) border-b border-(--border-color) flex items-center justify-between gap-3 shrink-0 flex-wrap">
         <div className="flex items-center space-x-2">
           <button
             onClick={onBackMobile}
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] lg:hidden focus-ring"
+            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) lg:hidden focus-ring"
             aria-label="Back to note list"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
 
           {/* Mode Switcher */}
-          <div className="flex items-center p-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl">
+          <div className="flex items-center p-1 bg-(--bg-card) border border-(--border-color) rounded-xl">
             <button
               onClick={() => setMode('edit')}
               className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition-colors focus-ring ${
                 mode === 'edit'
-                  ? 'bg-[var(--primary)] text-[var(--primary-contrast)] shadow-xs'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
+                  : 'text-(--text-muted) hover:text-(--text-main)'
               }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
@@ -196,8 +196,8 @@ export function NoteEditor({
               onClick={() => setMode('preview')}
               className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition-colors focus-ring ${
                 mode === 'preview'
-                  ? 'bg-[var(--primary)] text-[var(--primary-contrast)] shadow-xs'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
+                  : 'text-(--text-muted) hover:text-(--text-main)'
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
@@ -215,7 +215,7 @@ export function NoteEditor({
               className={`px-3 py-1.5 text-xs font-semibold rounded-xl border flex items-center space-x-1.5 transition-colors focus-ring ${
                 isArchived
                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
-                  : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-color)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  : 'bg-(--bg-card) text-(--text-muted) border-(--border-color) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
               }`}
               title={isArchived ? 'Restore Note' : 'Archive Note'}
             >
@@ -240,7 +240,7 @@ export function NoteEditor({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-1.5 text-xs font-bold bg-[var(--primary)] text-[var(--primary-contrast)] rounded-xl hover:opacity-90 transition-opacity focus-ring shadow-sm flex items-center space-x-1.5 disabled:opacity-50"
+            className="px-4 py-1.5 text-xs font-bold bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 transition-opacity focus-ring shadow-sm flex items-center space-x-1.5 disabled:opacity-50"
             title="Save changes (Cmd+S)"
           >
             <Save className="w-4 h-4" />
@@ -276,8 +276,8 @@ export function NoteEditor({
             }}
             aria-invalid={titleError ? 'true' : 'false'}
             aria-describedby={titleError ? 'title-error-msg' : undefined}
-            className={`w-full text-2xl sm:text-3xl font-extrabold bg-transparent border-b pb-2 text-[var(--text-main)] placeholder-[var(--text-muted)]/50 focus-ring transition-colors ${
-              titleError ? 'border-red-500 text-red-400' : 'border-[var(--border-color)]'
+            className={`w-full text-2xl sm:text-3xl font-extrabold bg-transparent border-b pb-2 text-(--text-main) placeholder-(--text-muted)/50 focus-ring transition-colors ${
+              titleError ? 'border-red-500 text-red-400' : 'border-(--border-color)'
             }`}
           />
           {titleError && (
@@ -290,16 +290,16 @@ export function NoteEditor({
 
         {/* Tag Editor Section */}
         <div className="space-y-2">
-          <div className="flex items-center space-x-2 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
-            <TagIcon className="w-3.5 h-3.5 text-[var(--primary)]" />
+          <div className="flex items-center space-x-2 text-xs font-bold text-(--text-muted) uppercase tracking-wider">
+            <TagIcon className="w-3.5 h-3.5 text-(--primary)" />
             <span>Tags</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 p-2 bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl min-h-[44px]">
+          <div className="flex flex-wrap items-center gap-2 p-2 bg-(--bg-surface) border border-(--border-color) rounded-xl min-h-11">
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[var(--primary)]/15 border border-[var(--primary)]/30 text-xs font-bold text-[var(--primary)]"
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-(--primary)/15 border border-(--primary)/30 text-xs font-bold text-(--primary)"
               >
                 <span>#{tag}</span>
                 <button
@@ -312,19 +312,19 @@ export function NoteEditor({
               </span>
             ))}
 
-            <div className="flex items-center space-x-1 flex-1 min-w-[140px]">
+            <div className="flex items-center space-x-1 flex-1 min-w-35">
               <input
                 type="text"
                 placeholder="Add tag (Press Enter)..."
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
-                className="w-full text-xs bg-transparent text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none px-2 py-1"
+                className="w-full text-xs bg-transparent text-(--text-main) placeholder-(--text-muted) focus:outline-none px-2 py-1"
               />
               {tagInput.trim() && (
                 <button
                   onClick={handleAddTag}
-                  className="p-1 text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded focus-ring"
+                  className="p-1 text-(--primary) hover:bg-(--primary)/10 rounded focus-ring"
                   title="Add tag"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ export function NoteEditor({
 
         {/* Content Section (Edit vs Preview) */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-[var(--text-muted)] pb-1">
+          <div className="flex items-center justify-between text-xs text-(--text-muted) pb-1">
             <span className="font-semibold uppercase tracking-wider">Content</span>
             <div className="flex items-center space-x-3">
               <span>{wordCount} words</span>
@@ -357,8 +357,8 @@ export function NoteEditor({
                 }}
                 aria-invalid={contentError ? 'true' : 'false'}
                 aria-describedby={contentError ? 'content-error-msg' : undefined}
-                className={`w-full min-h-[360px] p-4 bg-[var(--bg-surface)] border rounded-2xl text-sm leading-relaxed text-[var(--text-main)] placeholder-[var(--text-muted)]/50 focus-ring resize-y font-mono ${
-                  contentError ? 'border-red-500' : 'border-[var(--border-color)]'
+                className={`w-full min-h-90 p-4 bg-(--bg-surface) border rounded-2xl text-sm leading-relaxed text-(--text-main) placeholder-(--text-muted)/50 focus-ring resize-y font-mono ${
+                  contentError ? 'border-red-500' : 'border-(--border-color)'
                 }`}
               />
               {contentError && (
@@ -369,8 +369,8 @@ export function NoteEditor({
               )}
             </div>
           ) : (
-            <div className="w-full min-h-[360px] p-6 bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-2xl text-sm leading-relaxed text-[var(--text-main)] whitespace-pre-wrap font-sans">
-              {content || <span className="text-[var(--text-muted)] italic">No content written yet.</span>}
+            <div className="w-full min-h-90 p-6 bg-(--bg-surface) border border-(--border-color) rounded-2xl text-sm leading-relaxed text-(--text-main) whitespace-pre-wrap font-sans">
+              {content || <span className="text-(--text-muted) italic">No content written yet.</span>}
             </div>
           )}
         </div>

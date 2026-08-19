@@ -111,10 +111,10 @@ export function AuthModal({
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
-      <div className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
-        <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
-          <h2 id="auth-modal-title" className="text-xl font-bold text-[var(--text-main)] flex items-center space-x-2">
-            <Lock className="w-5 h-5 text-[var(--primary)]" />
+      <div className="w-full max-w-md bg-(--bg-surface) border border-(--border-color) rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="flex items-center justify-between border-b border-(--border-color) pb-3">
+          <h2 id="auth-modal-title" className="text-xl font-bold text-(--text-main) flex items-center space-x-2">
+            <Lock className="w-5 h-5 text-(--primary)" />
             <span>
               {view === 'login' && 'Sign In to Inkwell'}
               {view === 'register' && 'Create Your Account'}
@@ -123,7 +123,7 @@ export function AuthModal({
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] focus-ring"
+            className="p-1 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) focus-ring"
             aria-label="Close authentication modal"
           >
             <X className="w-5 h-5" />
@@ -147,15 +147,15 @@ export function AuthModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {view === 'register' && (
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)]">Full Name (Optional)</label>
+              <label className="text-xs font-semibold text-(--text-muted)">Full Name (Optional)</label>
               <div className="relative">
-                <UserIcon className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                <UserIcon className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                 <input
                   type="text"
                   placeholder="Sarah Jenkins"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                 />
               </div>
             </div>
@@ -164,23 +164,23 @@ export function AuthModal({
           {(view === 'login' || view === 'register') && (
             <>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[var(--text-muted)]">Email Address *</label>
+                <label className="text-xs font-semibold text-(--text-muted)">Email Address *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                  <Mail className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="email"
                     required
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-[var(--text-muted)]">Password *</label>
+                  <label className="text-xs font-semibold text-(--text-muted)">Password *</label>
                   {view === 'login' && (
                     <button
                       type="button"
@@ -188,14 +188,14 @@ export function AuthModal({
                         onClose();
                         onOpenForgotPassword();
                       }}
-                      className="text-xs text-[var(--primary)] hover:underline focus-ring"
+                      className="text-xs text-(--primary) hover:underline focus-ring"
                     >
                       Forgot password?
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
@@ -203,7 +203,7 @@ export function AuthModal({
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                   />
                 </div>
               </div>
@@ -213,24 +213,24 @@ export function AuthModal({
           {view === 'changePassword' && (
             <>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[var(--text-muted)]">Current Password *</label>
+                <label className="text-xs font-semibold text-(--text-muted)">Current Password *</label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
                     placeholder="••••••••"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[var(--text-muted)]">New Password *</label>
+                <label className="text-xs font-semibold text-(--text-muted)">New Password *</label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
@@ -238,7 +238,7 @@ export function AuthModal({
                     placeholder="At least 6 characters"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                   />
                 </div>
               </div>
@@ -248,7 +248,7 @@ export function AuthModal({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-[var(--primary)] text-[var(--primary-contrast)] font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
+            className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
           >
             {loading
               ? 'Processing...'
@@ -261,7 +261,7 @@ export function AuthModal({
         </form>
 
         {view !== 'changePassword' && (
-          <div className="text-center pt-2 text-xs text-[var(--text-muted)]">
+          <div className="text-center pt-2 text-xs text-(--text-muted)">
             {view === 'login' ? (
               <p>
                 Don't have an account?{' '}
@@ -270,7 +270,7 @@ export function AuthModal({
                     setView('register');
                     setError(null);
                   }}
-                  className="font-semibold text-[var(--primary)] hover:underline focus-ring"
+                  className="font-semibold text-(--primary) hover:underline focus-ring"
                 >
                   Create one now
                 </button>
@@ -283,7 +283,7 @@ export function AuthModal({
                     setView('login');
                     setError(null);
                   }}
-                  className="font-semibold text-[var(--primary)] hover:underline focus-ring"
+                  className="font-semibold text-(--primary) hover:underline focus-ring"
                 >
                   Sign in here
                 </button>

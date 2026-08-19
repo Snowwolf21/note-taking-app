@@ -45,8 +45,8 @@
     "title": "React 19 & Server Components Architecture",
     "content": "React Server Components (RSC) allow components to render on the server and stream to the browser.\n\n### Key Benefits:\n- **Zero Bundle Size**: Server components do not ship JS code to client browsers.\n- **Direct Database Access**: Fetch data right inside async server components.\n- **Automatic Code Splitting**: Client components imported inside server components are split into small lazy chunks.\n\n```tsx\nexport async function NotesList() {\n  const notes = await db.note.findMany();\n  return <ul role=\"list\">{notes.map(n => <li key={n.id}>{n.title}</li>)}</ul>;\n}\n```",
     "tags": "[\"React\",\"Architecture\",\"Dev\"]",
-    "isArchived": true,
+    "isArchived": false,
     "createdAt": "2026-08-17T17:43:09.953Z",
-    "updatedAt": "2026-08-19T09:36:46.416Z"
+    "updatedAt": "2026-08-19T11:15:43.611Z"
   }
 ]

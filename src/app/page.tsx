@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { NoteList, NoteItem } from '@/components/NoteList';
 import { NoteEditor } from '@/components/NoteEditor';
@@ -36,7 +36,36 @@ export default function Home() {
   // Mobile navigation drawer toggle
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // 1. Initial Load: Check Auth & Fetch Notes & Load Themes from LocalStorage
+  const fetchNotes = useCallback(async () => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (activeView === 'archived') queryParams.set('archived', 'true');
+      if (activeTag) queryParams.set('tag', activeTag);
+      if (searchQuery) queryParams.set('search', searchQuery);
+
+      const res = await fetch(`/api/notes?${queryParams.toString()}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch notes: ${res.statusText}`);
+      }
+      const data = await res.json();
+
+      if (Array.isArray(data.notes)) {
+        setNotes(data.notes);
+        if (data.notes.length > 0) {
+          setSelectedNoteId((prevId) => {
+            const exists = data.notes.some((n: NoteItem) => n.id === prevId);
+            return exists ? prevId : data.notes[0].id;
+          });
+        } else {
+          setSelectedNoteId(null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch notes:', err);
+    }
+  }, [activeView, activeTag, searchQuery]);
+
+  // 1. Initial Load: Check Auth & Load Themes from LocalStorage
   useEffect(() => {
     // Local theme cache
     const savedTheme = localStorage.getItem('inkwell_color_theme');
@@ -45,7 +74,6 @@ export default function Home() {
     if (savedFont) setFontTheme(savedFont);
 
     checkAuth();
-    fetchNotes();
   }, []);
 
   // Update HTML data attributes on theme changes
@@ -75,30 +103,9 @@ export default function Home() {
     }
   };
 
-  const fetchNotes = async () => {
-    try {
-      const queryParams = new URLSearchParams();
-      if (activeView === 'archived') queryParams.set('archived', 'true');
-      if (activeTag) queryParams.set('tag', activeTag);
-      if (searchQuery) queryParams.set('search', searchQuery);
-
-      const res = await fetch(`/api/notes?${queryParams.toString()}`);
-      const data = await res.json();
-
-      if (data.notes) {
-        setNotes(data.notes);
-        if (data.notes.length > 0 && !selectedNoteId) {
-          setSelectedNoteId(data.notes[0].id);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch notes:', err);
-    }
-  };
-
   useEffect(() => {
     fetchNotes();
-  }, [activeView, activeTag, searchQuery]);
+  }, [fetchNotes]);
 
   // Global Keyboard Shortcuts (Cmd+N for New Note)
   useEffect(() => {
@@ -225,7 +232,7 @@ export default function Home() {
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-main)] font-[var(--font-family-active)]">
+    <div className="flex h-screen w-screen overflow-hidden bg-(--bg-main) font-(--font-family-active)">
       {/* 1. Left Sidebar Navigation */}
       <Sidebar
         activeView={activeView}

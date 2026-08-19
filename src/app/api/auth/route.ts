@@ -8,6 +8,7 @@ import {
   clearAuthCookie,
   getCurrentUser,
 } from '@/lib/auth';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -21,6 +22,19 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { action } = body;
+
+    // Rate-limit sensitive auth actions: max 10 requests per minute per IP
+    const sensitiveActions = ['login', 'register', 'forgot-password', 'reset-password'];
+    if (sensitiveActions.includes(action)) {
+      const ip = getClientIp(req);
+      const allowed = checkRateLimit(`${ip}:${action}`, { limit: 10, windowMs: 60_000 });
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please wait a moment and try again.' },
+          { status: 429 }
+        );
+      }
+    }
 
     // 1. REGISTER
     if (action === 'register') {
@@ -186,8 +200,7 @@ export async function POST(req: Request) {
       });
 
       return NextResponse.json({
-        message: 'Password reset code created successfully.',
-        demoResetCode: token, // Included for easy offline testing & demo
+        message: 'If an account exists with this email, a reset code has been sent.',
       });
     }
 

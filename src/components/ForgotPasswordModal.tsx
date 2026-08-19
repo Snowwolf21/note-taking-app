@@ -22,7 +22,6 @@ export function ForgotPasswordModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [demoCode, setDemoCode] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -40,11 +39,7 @@ export function ForgotPasswordModal({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to generate reset code');
 
-      setSuccessMsg('Reset code generated successfully!');
-      if (data.demoResetCode) {
-        setDemoCode(data.demoResetCode);
-        setCode(data.demoResetCode); // Pre-fill for seamless user testing
-      }
+      setSuccessMsg('A reset code has been sent to your email. Enter it below.');
       setStep(2);
     } catch (err: any) {
       setError(err.message || 'An error occurred.');
@@ -86,15 +81,15 @@ export function ForgotPasswordModal({
       aria-modal="true"
       aria-labelledby="forgot-password-title"
     >
-      <div className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
-        <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
-          <h2 id="forgot-password-title" className="text-xl font-bold text-[var(--text-main)] flex items-center space-x-2">
-            <RefreshCw className="w-5 h-5 text-[var(--primary)]" />
+      <div className="w-full max-w-md bg-(--bg-surface) border border-(--border-color) rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="flex items-center justify-between border-b border-(--border-color) pb-3">
+          <h2 id="forgot-password-title" className="text-xl font-bold text-(--text-main) flex items-center space-x-2">
+            <RefreshCw className="w-5 h-5 text-(--primary)" />
             <span>Reset Your Password</span>
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] focus-ring"
+            className="p-1 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) focus-ring"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -117,55 +112,52 @@ export function ForgotPasswordModal({
 
         {step === 1 ? (
           <form onSubmit={handleRequestCode} className="space-y-4">
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-(--text-muted)">
               Enter your registered email address below. We'll generate a verification code to reset your password.
             </p>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)]">Email Address</label>
+              <label className="text-xs font-semibold text-(--text-muted)">Email Address</label>
               <div className="relative">
-                <Mail className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                <Mail className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                 <input
                   type="email"
                   required
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                 />
               </div>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-[var(--primary)] text-[var(--primary-contrast)] font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
+              className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
             >
               {loading ? 'Sending code...' : 'Generate Reset Code'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
-            {demoCode && (
-              <div className="p-3 bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-lg text-xs text-[var(--text-main)]">
-                <span className="font-semibold block mb-0.5 text-[var(--primary)]">Demo Verification PIN Code:</span>
-                <span className="font-mono text-base font-bold tracking-widest">{demoCode}</span>
-              </div>
-            )}
+            <p className="text-sm text-(--text-muted)">
+              Enter the 6-digit code sent to your email address.
+            </p>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)]">6-Digit Verification PIN Code</label>
+              <label className="text-xs font-semibold text-(--text-muted)">6-Digit Verification PIN Code</label>
               <input
                 type="text"
                 required
                 placeholder="123456"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] font-mono tracking-widest focus-ring"
+                className="w-full px-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) font-mono tracking-widest focus-ring"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)]">New Password</label>
+              <label className="text-xs font-semibold text-(--text-muted)">New Password</label>
               <div className="relative">
-                <KeyRound className="w-4 h-4 absolute left-3 top-3 text-[var(--text-muted)]" />
+                <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
                 <input
                   type="password"
                   required
@@ -173,7 +165,7 @@ export function ForgotPasswordModal({
                   placeholder="At least 6 characters"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus-ring"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
                 />
               </div>
             </div>
@@ -181,21 +173,21 @@ export function ForgotPasswordModal({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-[var(--primary)] text-[var(--primary-contrast)] font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
+              className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
             >
               {loading ? 'Updating password...' : 'Save New Password & Sign In'}
             </button>
           </form>
         )}
 
-        <div className="text-center pt-2 text-xs text-[var(--text-muted)]">
+        <div className="text-center pt-2 text-xs text-(--text-muted)">
           Remembered your password?{' '}
           <button
             onClick={() => {
               onClose();
               onOpenLogin();
             }}
-            className="font-semibold text-[var(--primary)] hover:underline focus-ring"
+            className="font-semibold text-(--primary) hover:underline focus-ring"
           >
             Back to Sign In
           </button>

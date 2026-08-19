@@ -3,9 +3,15 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { db } from './db';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'note-taking-app-super-secret-key-2026'
-);
+const jwtSecretEnv = process.env.JWT_SECRET;
+if (!jwtSecretEnv) {
+  throw new Error(
+    'FATAL: JWT_SECRET environment variable is not set. ' +
+    'Add it to your .env.local file before starting the server.'
+  );
+}
+
+const JWT_SECRET = new TextEncoder().encode(jwtSecretEnv);
 
 const TOKEN_COOKIE_NAME = 'auth_token';
 

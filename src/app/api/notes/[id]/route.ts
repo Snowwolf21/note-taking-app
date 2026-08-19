@@ -18,7 +18,9 @@ export async function GET(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    if (note.userId && currentUser && note.userId !== currentUser.id) {
+    // Strict ownership check: guest (null) can only read guest notes; users only their own.
+    const expectedId = currentUser?.id ?? null;
+    if (note.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -57,7 +59,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    if (existing.userId && currentUser && existing.userId !== currentUser.id) {
+    const expectedId = currentUser?.id ?? null;
+    if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -100,7 +103,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    if (existing.userId && currentUser && existing.userId !== currentUser.id) {
+    const expectedId = currentUser?.id ?? null;
+    if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -134,7 +138,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    if (existing.userId && currentUser && existing.userId !== currentUser.id) {
+    const expectedId = currentUser?.id ?? null;
+    if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
