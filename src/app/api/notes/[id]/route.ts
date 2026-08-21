@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, getOrCreateGuestId } from '@/lib/auth';
 
 export async function GET(
   req: Request,
@@ -9,6 +9,7 @@ export async function GET(
   try {
     const { id } = await params;
     const currentUser = await getCurrentUser();
+    const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
 
     const note = await db.note.findUnique({
       where: { id },
@@ -18,8 +19,6 @@ export async function GET(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    // Strict ownership check: guest (null) can only read guest notes; users only their own.
-    const expectedId = currentUser?.id ?? null;
     if (note.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -43,6 +42,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const currentUser = await getCurrentUser();
+    const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
     const { title, content, tags, isArchived } = body;
 
@@ -59,7 +59,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    const expectedId = currentUser?.id ?? null;
     if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -95,6 +94,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const currentUser = await getCurrentUser();
+    const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
     const { isArchived } = body;
 
@@ -103,7 +103,6 @@ export async function PATCH(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    const expectedId = currentUser?.id ?? null;
     if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -132,13 +131,13 @@ export async function DELETE(
   try {
     const { id } = await params;
     const currentUser = await getCurrentUser();
+    const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
 
     const existing = await db.note.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    const expectedId = currentUser?.id ?? null;
     if (existing.userId !== expectedId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

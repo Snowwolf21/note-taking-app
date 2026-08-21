@@ -1,51 +1,65 @@
 /**
- * Lightweight in-memory rate limiter.
- * Uses a Map to track request timestamps per key (e.g. IP + action).
- * No external dependencies required.
+ * Lightweight in-memory rate limiter with automatic stale key pruning.
+ * Tracks request timestamps per key (e.g. IP + action).
  */
 
 interface RateLimitOptions {
-  /** Max requests allowed within the window */
   limit: number;
-  /** Time window in milliseconds */
   windowMs: number;
 }
 
-// Store: key → array of request timestamps
 const store = new Map<string, number[]>();
 
 /**
- * Returns true if the request is allowed, false if it should be rate-limited.
- * @param key   Unique identifier, e.g. `${ip}:login`
- * @param opts  Rate limit configuration
+ * Periodically prunes expired entries to prevent memory leaks.
+ */
+function pruneStore() {
+  const now = Date.now();
+  for (const [key, timestamps] of store.entries()) {
+    const validTimestamps = timestamps.filter((t) => t > now - 3600_000);
+    if (validTimestamps.length === 0) {
+      store.delete(key);
+    } else {
+      store.set(key, validTimestamps);
+    }
+  }
+}
+
+// Prune stale IP entries every 10 minutes
+if (typeof setInterval !== 'undefined') {
+  setInterval(pruneStore, 10 * 60 * 1000).unref?.();
+}
+
+/**
+ * Returns true if the request is allowed, false if rate limited.
  */
 export function checkRateLimit(key: string, opts: RateLimitOptions): boolean {
   const now = Date.now();
   const windowStart = now - opts.windowMs;
 
-  // Get existing timestamps for this key, filter out expired ones
   const timestamps = (store.get(key) ?? []).filter((t) => t > windowStart);
 
   if (timestamps.length >= opts.limit) {
-    // Store updated (cleaned) list and reject
     store.set(key, timestamps);
     return false;
   }
 
-  // Allow — record this timestamp
   timestamps.push(now);
   store.set(key, timestamps);
   return true;
 }
 
 /**
- * Extract the client IP from a Next.js Request.
- * Falls back to 'unknown' if headers are not present.
+ * Extract client IP securely.
  */
 export function getClientIp(req: Request): string {
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    const firstIp = forwarded.split(',')[0].trim();
+    if (firstIp && firstIp !== '::1' && firstIp !== '127.0.0.1') {
+      return firstIp;
+    }
   }
-  return req.headers.get('x-real-ip') ?? 'unknown';
+  return req.headers.get('x-real-ip') ?? '127.0.0.1';
 }
+

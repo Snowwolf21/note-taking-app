@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Lora, Fira_Code } from 'next/font/google';
+import { Providers } from './providers';
 import './globals.css';
 
 const inter = Inter({
@@ -22,18 +23,17 @@ const firaCode = Fira_Code({
 
 export const metadata: Metadata = {
   title: 'Inkwell - Note Taking Web App',
-  description: 'Full-stack accessible note-taking application with dark mode, customizable font themes, tags, instant search, and full keyboard navigation.',
+  description:
+    'Full-stack accessible note-taking application with dark mode, customizable font themes, tags, instant search, and full keyboard navigation.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable} ${firaCode.variable}`}>
       <body className="antialiased min-h-screen bg-(--bg-main) text-(--text-main) font-(--font-family-active) transition-colors duration-200">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

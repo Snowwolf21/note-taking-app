@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, getOrCreateGuestId } from '@/lib/auth';
 
 const INITIAL_DEMO_NOTES = [
   {
@@ -69,26 +69,22 @@ export async function NotesList() {
 export async function GET(req: Request) {
   try {
     const currentUser = await getCurrentUser();
+    const ownerId = currentUser ? currentUser.id : await getOrCreateGuestId();
+
     const { searchParams } = new URL(req.url);
     const tag = searchParams.get('tag');
     const search = searchParams.get('search');
     const archived = searchParams.get('archived') === 'true';
 
-    let whereClause: any = {};
+    let whereClause: any = { userId: ownerId };
 
-    if (currentUser) {
-      whereClause.userId = currentUser.id;
-    } else {
-      whereClause.userId = null;
-    }
-
-    // Check count for user/guest, auto-seed if 0 notes exist
-    const count = await db.note.count({ where: { userId: currentUser ? currentUser.id : null } });
+    // Check count for user/guest session, seed if 0 notes exist
+    const count = await db.note.count({ where: { userId: ownerId } });
     if (count === 0) {
       for (const demoNote of INITIAL_DEMO_NOTES) {
         await db.note.create({
           data: {
-            userId: currentUser ? currentUser.id : null,
+            userId: ownerId,
             title: demoNote.title,
             content: demoNote.content,
             tags: JSON.stringify(demoNote.tags),
@@ -141,6 +137,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const currentUser = await getCurrentUser();
+    const ownerId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
     const { title, content, tags, isArchived } = body;
 
@@ -156,7 +153,7 @@ export async function POST(req: Request) {
 
     const note = await db.note.create({
       data: {
-        userId: currentUser ? currentUser.id : null,
+        userId: ownerId,
         title: title.trim(),
         content: content.trim(),
         tags: JSON.stringify(parsedTags),

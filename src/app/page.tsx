@@ -1,111 +1,78 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { NoteList, NoteItem } from '@/components/NoteList';
+import { NoteList } from '@/components/NoteList';
 import { NoteEditor } from '@/components/NoteEditor';
 import { SettingsModal } from '@/components/SettingsModal';
 import { AuthModal } from '@/components/AuthModal';
 import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
 import { ConfirmModal } from '@/components/ConfirmModal';
 
+import { useAppStore } from '@/store/useAppStore';
+import { useNotes } from '@/hooks/useNotes';
+
 export default function Home() {
-  const [notes, setNotes] = useState<NoteItem[]>([]);
-  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<'all' | 'archived'>('all');
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isNewNoteMode, setIsNewNoteMode] = useState(false);
+  // Store state & actions
+  const {
+    activeView,
+    setActiveView,
+    activeTag,
+    setActiveTag,
+    searchQuery,
+    setSearchQuery,
+    selectedNoteId,
+    setSelectedNoteId,
+    isNewNoteMode,
+    setIsNewNoteMode,
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+    colorTheme,
+    setColorTheme,
+    fontTheme,
+    setFontTheme,
+    user,
+    setUser,
+    isSettingsOpen,
+    openSettings,
+    closeSettings,
+    authModal,
+    openAuthModal,
+    closeAuthModal,
+    isForgotPasswordOpen,
+    openForgotPassword,
+    closeForgotPassword,
+    noteToDeleteId,
+    setNoteToDeleteId,
+  } = useAppStore();
 
-  // Themes
-  const [colorTheme, setColorTheme] = useState('dark');
-  const [fontTheme, setFontTheme] = useState('sans');
+  // Server state & mutations via TanStack Query
+  const { notes, saveNote, archiveToggle, deleteNote } = useNotes();
 
-  // User state
-  const [user, setUser] = useState<any>(null);
-
-  // Modals
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [authModalConfig, setAuthModalConfig] = useState<{
-    isOpen: boolean;
-    view: 'login' | 'register' | 'changePassword';
-  }>({ isOpen: false, view: 'login' });
-  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [noteToDeleteId, setNoteToDeleteId] = useState<string | null>(null);
-
-  // Mobile navigation drawer toggle
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  const fetchNotes = useCallback(async () => {
-    try {
-      const queryParams = new URLSearchParams();
-      if (activeView === 'archived') queryParams.set('archived', 'true');
-      if (activeTag) queryParams.set('tag', activeTag);
-      if (searchQuery) queryParams.set('search', searchQuery);
-
-      const res = await fetch(`/api/notes?${queryParams.toString()}`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch notes: ${res.statusText}`);
-      }
-      const data = await res.json();
-
-      if (Array.isArray(data.notes)) {
-        setNotes(data.notes);
-        if (data.notes.length > 0) {
-          setSelectedNoteId((prevId) => {
-            const exists = data.notes.some((n: NoteItem) => n.id === prevId);
-            return exists ? prevId : data.notes[0].id;
-          });
-        } else {
-          setSelectedNoteId(null);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch notes:', err);
-    }
-  }, [activeView, activeTag, searchQuery]);
-
-  // 1. Initial Load: Check Auth & Load Themes from LocalStorage
+  // Initial load: restore themes from localStorage & check auth status
   useEffect(() => {
-    // Local theme cache
     const savedTheme = localStorage.getItem('inkwell_color_theme');
     const savedFont = localStorage.getItem('inkwell_font_theme');
     if (savedTheme) setColorTheme(savedTheme);
     if (savedFont) setFontTheme(savedFont);
 
-    checkAuth();
-  }, []);
-
-  // Update HTML data attributes on theme changes
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', colorTheme);
-    localStorage.setItem('inkwell_color_theme', colorTheme);
-  }, [colorTheme]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-font', fontTheme);
-    localStorage.setItem('inkwell_font_theme', fontTheme);
-  }, [fontTheme]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('/api/auth');
-      const data = await res.json();
-      if (data.user) {
-        setUser(data.user);
-        if (data.user.colorTheme) setColorTheme(data.user.colorTheme);
-        if (data.user.fontTheme) setFontTheme(data.user.fontTheme);
-      } else {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth');
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          if (data.user.colorTheme) setColorTheme(data.user.colorTheme);
+          if (data.user.fontTheme) setFontTheme(data.user.fontTheme);
+        } else {
+          setUser(null);
+        }
+      } catch {
         setUser(null);
       }
-    } catch {
-      setUser(null);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+    };
+    checkAuth();
+  }, [setColorTheme, setFontTheme, setUser]);
 
   // Global Keyboard Shortcuts (Cmd+N for New Note)
   useEffect(() => {
@@ -155,68 +122,21 @@ export default function Home() {
     tags: string[];
     isArchived: boolean;
   }) => {
-    if (noteData.id) {
-      // Update existing note
-      const res = await fetch(`/api/notes/${noteData.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(noteData),
-      });
-      const data = await res.json();
-      if (data.note) {
-        setNotes((prev) => prev.map((n) => (n.id === data.note.id ? data.note : n)));
-        setIsNewNoteMode(false);
-      }
-    } else {
-      // Create new note
-      const res = await fetch('/api/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(noteData),
-      });
-      const data = await res.json();
-      if (data.note) {
-        setNotes((prev) => [data.note, ...prev]);
-        setSelectedNoteId(data.note.id);
-        setIsNewNoteMode(false);
-      }
-    }
+    await saveNote(noteData);
+    setIsNewNoteMode(false);
   };
 
   const handleArchiveToggle = async (id: string, currentArchived: boolean) => {
-    try {
-      const res = await fetch(`/api/notes/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isArchived: !currentArchived }),
-      });
-      const data = await res.json();
-      if (data.note) {
-        setNotes((prev) => prev.filter((n) => n.id !== id));
-        fetchNotes();
-      }
-    } catch (err) {
-      console.error('Archive failed:', err);
-    }
+    await archiveToggle({ id, isArchived: !currentArchived });
   };
 
   const handleDeleteConfirm = async () => {
     if (!noteToDeleteId) return;
-    try {
-      const res = await fetch(`/api/notes/${noteToDeleteId}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        setNotes((prev) => prev.filter((n) => n.id !== noteToDeleteId));
-        if (selectedNoteId === noteToDeleteId) {
-          setSelectedNoteId(null);
-        }
-      }
-    } catch (err) {
-      console.error('Delete failed:', err);
-    } finally {
-      setNoteToDeleteId(null);
+    await deleteNote(noteToDeleteId);
+    if (selectedNoteId === noteToDeleteId) {
+      setSelectedNoteId(null);
     }
+    setNoteToDeleteId(null);
   };
 
   const handleLogout = async () => {
@@ -226,7 +146,6 @@ export default function Home() {
       body: JSON.stringify({ action: 'logout' }),
     });
     setUser(null);
-    fetchNotes();
   };
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
@@ -247,9 +166,9 @@ export default function Home() {
           setIsNewNoteMode(false);
         }}
         onNewNote={handleNewNote}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={openSettings}
         user={user}
-        onOpenAuth={(view = 'login') => setAuthModalConfig({ isOpen: true, view })}
+        onOpenAuth={(view = 'login') => openAuthModal(view)}
         onLogout={handleLogout}
         noteCounts={noteCounts}
         mobileOpen={mobileSidebarOpen}
@@ -286,7 +205,7 @@ export default function Home() {
       {/* Modals & Dialogs */}
       <SettingsModal
         isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        onClose={closeSettings}
         colorTheme={colorTheme}
         fontTheme={fontTheme}
         onSelectColorTheme={async (t) => {
@@ -312,20 +231,19 @@ export default function Home() {
       />
 
       <AuthModal
-        isOpen={authModalConfig.isOpen}
-        initialView={authModalConfig.view}
-        onClose={() => setAuthModalConfig({ ...authModalConfig, isOpen: false })}
+        isOpen={authModal.isOpen}
+        initialView={authModal.view}
+        onClose={closeAuthModal}
         onAuthSuccess={(u) => {
           setUser(u);
-          fetchNotes();
         }}
-        onOpenForgotPassword={() => setIsForgotPasswordOpen(true)}
+        onOpenForgotPassword={openForgotPassword}
       />
 
       <ForgotPasswordModal
         isOpen={isForgotPasswordOpen}
-        onClose={() => setIsForgotPasswordOpen(false)}
-        onOpenLogin={() => setAuthModalConfig({ isOpen: true, view: 'login' })}
+        onClose={closeForgotPassword}
+        onOpenLogin={() => openAuthModal('login')}
       />
 
       <ConfirmModal

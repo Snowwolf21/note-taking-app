@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { randomInt } from 'crypto';
 import { db } from '@/lib/db';
 import {
   hashPassword,
@@ -187,7 +188,7 @@ export async function POST(req: Request) {
         });
       }
 
-      const token = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit PIN code for easy testing
+      const token = randomInt(100000, 999999).toString(); // Cryptographically secure 6-digit PIN code
       const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
 
       await db.passwordResetToken.create({

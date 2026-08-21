@@ -14,6 +14,7 @@ if (!jwtSecretEnv) {
 const JWT_SECRET = new TextEncoder().encode(jwtSecretEnv);
 
 const TOKEN_COOKIE_NAME = 'auth_token';
+const GUEST_COOKIE_NAME = 'guest_token';
 
 export interface UserSession {
   id: string;
@@ -21,6 +22,22 @@ export interface UserSession {
   name?: string | null;
   fontTheme: string;
   colorTheme: string;
+}
+
+export async function getOrCreateGuestId(): Promise<string> {
+  const cookieStore = await cookies();
+  let guestId = cookieStore.get(GUEST_COOKIE_NAME)?.value;
+  if (!guestId) {
+    guestId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    cookieStore.set(GUEST_COOKIE_NAME, guestId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+  }
+  return guestId;
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -89,3 +106,4 @@ export async function getCurrentUser(): Promise<UserSession | null> {
     return null;
   }
 }
+
