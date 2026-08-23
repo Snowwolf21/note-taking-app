@@ -122,7 +122,7 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
       title="Drag anywhere or click for Settings & Themes"
       aria-label="Appearance & Theme Settings Widget (Draggable)"
     >
-      <Settings className={`w-6 h-6 ${isDragging ? 'animate-spin' : ''}`} />
+      <Settings className={`w-6 h-6 ${isDragging ? 'bg-(--primary)/15' : ''}`} />
     </button>
   );
 }

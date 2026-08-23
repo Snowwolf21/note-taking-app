@@ -16,6 +16,7 @@ import {
   Edit3,
   ArrowLeft,
   Menu,
+  Lock,
 } from 'lucide-react';
 import { NoteItem } from './NoteList';
 
@@ -27,6 +28,8 @@ interface NoteEditorProps {
   onBackMobile: () => void;
   onOpenMobileSidebar?: () => void;
   isNewNoteMode?: boolean;
+  isGuest?: boolean;
+  onOpenAuth?: () => void;
 }
 
 export function NoteEditor({
@@ -37,6 +40,8 @@ export function NoteEditor({
   onBackMobile,
   onOpenMobileSidebar,
   isNewNoteMode = false,
+  isGuest = false,
+  onOpenAuth,
 }: NoteEditorProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -131,6 +136,10 @@ export function NoteEditor({
   };
 
   const handleSave = async () => {
+    if (isGuest) {
+      onOpenAuth?.();
+      return;
+    }
     if (!validateForm()) return;
     setSaving(true);
     setSaveSuccess(null);
@@ -144,9 +153,9 @@ export function NoteEditor({
         isArchived,
       });
       setSaveSuccess('Note saved successfully!');
-      setTimeout(() => setSaveSuccess(null), 2500);
-    } catch (err: any) {
-      console.error('Save failed:', err);
+      setTimeout(() => setSaveSuccess(null), 3000);
+    } catch {
+      // Handled in parent query error
     } finally {
       setSaving(false);
     }
@@ -163,14 +172,31 @@ export function NoteEditor({
 
   if (!note && !isNewNoteMode) {
     return (
-      <div className="hidden lg:flex flex-1 flex-col items-center justify-center p-8 text-center bg-(--bg-main) text-(--text-muted) space-y-3">
-        <div className="p-4 bg-(--bg-surface) rounded-2xl border border-(--border-color) shadow-sm">
-          <Edit3 className="w-10 h-10 text-(--primary) mx-auto opacity-50" />
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-(--bg-main) space-y-4" aria-label="No Note Selected">
+        <div className="p-4 bg-(--bg-surface) border border-(--border-color) rounded-2xl shadow-sm text-(--primary)">
+          <Calendar className="w-10 h-10" />
         </div>
-        <h3 className="text-lg font-bold text-(--text-main)">No Note Selected</h3>
-        <p className="text-sm max-w-sm">
-          Select a note from the left directory list or click <strong className="text-(--primary)">Create New Note</strong> to start editing.
-        </p>
+        <div className="space-y-1 max-w-sm">
+          <h2 className="text-xl font-bold text-(--text-main)">Select a note to view</h2>
+          <p className="text-xs text-(--text-muted) leading-relaxed">
+            Choose a note from the list on the left or create a new note to start capturing your ideas.
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            if (isGuest) {
+              onOpenAuth?.();
+              return;
+            }
+            // Trigger new note via focus
+            const newBtn = document.querySelector('button[title*="Cmd+N"]') as HTMLButtonElement;
+            newBtn?.click();
+          }}
+          className="px-4 py-2 bg-(--primary) text-(--primary-contrast) text-xs font-bold rounded-xl btn-interactive focus-ring shadow-sm flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>{isGuest ? 'Sign In to Create Note' : 'Create New Note'}</span>
+        </button>
       </div>
     );
   }
@@ -180,17 +206,6 @@ export function NoteEditor({
       {/* Top Action Bar */}
       <div className="px-4 py-3 bg-(--bg-surface) border-b border-(--border-color) flex items-center justify-between gap-3 shrink-0 flex-wrap">
         <div className="flex items-center space-x-2">
-          {onOpenMobileSidebar && (
-            <button
-              onClick={onOpenMobileSidebar}
-              className="p-1.5 rounded-lg text-(--text-main) bg-(--bg-card) border border-(--border-color) hover:bg-(--bg-surface-hover) lg:hidden btn-interactive focus-ring shadow-xs flex items-center justify-center"
-              aria-label="Open sidebar drawer"
-              title="Open navigation menu"
-            >
-              <Menu className="w-5 h-5 text-(--primary)" />
-            </button>
-          )}
-
           <button
             onClick={onBackMobile}
             className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) md:hidden btn-interactive focus-ring"
@@ -231,7 +246,13 @@ export function NoteEditor({
           {/* Archive / Unarchive */}
           {note?.id && (
             <button
-              onClick={() => onArchiveToggle(note.id, isArchived)}
+              onClick={() => {
+                if (isGuest) {
+                  onOpenAuth?.();
+                  return;
+                }
+                onArchiveToggle(note.id, isArchived);
+              }}
               className={`px-3 py-1.5 text-xs font-semibold rounded-xl border flex items-center space-x-1.5 btn-interactive focus-ring ${
                 isArchived
                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
@@ -240,19 +261,25 @@ export function NoteEditor({
               title={isArchived ? 'Restore Note' : 'Archive Note'}
             >
               {isArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isArchived ? 'Unarchive' : 'Archive'}</span>
+              <span className="hidden lg:inline">{isArchived ? 'Unarchive' : 'Archive'}</span>
             </button>
           )}
 
           {/* Delete Note */}
           {note?.id && (
             <button
-              onClick={() => onDeleteNote(note.id)}
+              onClick={() => {
+                if (isGuest) {
+                  onOpenAuth?.();
+                  return;
+                }
+                onDeleteNote(note.id);
+              }}
               className="px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 btn-interactive focus-ring flex items-center space-x-1.5"
               title="Delete Note"
             >
               <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Delete</span>
+              <span className="hidden lg:inline">Delete</span>
             </button>
           )}
 
@@ -264,7 +291,7 @@ export function NoteEditor({
             title="Save changes (Cmd+S)"
           >
             <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving...' : 'Save Note'}</span>
+            <span className='hidden lg:inline'>{saving ? 'Saving...' : 'Save Note'}</span>
           </button>
         </div>
       </div>

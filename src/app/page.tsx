@@ -113,6 +113,10 @@ export default function Home() {
   }, [noteCounts]);
 
   const handleNewNote = () => {
+    if (!user) {
+      openAuthModal('login');
+      return;
+    }
     setSelectedNoteId(null);
     setIsNewNoteMode(true);
   };
@@ -124,16 +128,28 @@ export default function Home() {
     tags: string[];
     isArchived: boolean;
   }) => {
+    if (!user) {
+      openAuthModal('login');
+      return;
+    }
     await saveNote(noteData);
     setIsNewNoteMode(false);
   };
 
   const handleArchiveToggle = async (id: string, currentArchived: boolean) => {
+    if (!user) {
+      openAuthModal('login');
+      return;
+    }
     await archiveToggle({ id, isArchived: !currentArchived });
   };
 
   const handleDeleteConfirm = async () => {
     if (!noteToDeleteId) return;
+    if (!user) {
+      openAuthModal('login');
+      return;
+    }
     await deleteNote(noteToDeleteId);
     if (selectedNoteId === noteToDeleteId) {
       setSelectedNoteId(null);
@@ -150,10 +166,12 @@ export default function Home() {
     setUser(null);
   };
 
-  const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
+  const selectedNote = useMemo(() => {
+    return notes.find((n) => n.id === selectedNoteId) || null;
+  }, [notes, selectedNoteId]);
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-(--bg-main) font-(--font-family-active)">
+    <div className="flex h-dvh w-full overflow-hidden bg-(--bg-main) text-(--text-main) transition-colors duration-150 relative" data-theme={colorTheme} data-font={fontTheme}>
       {/* 1. Left Sidebar Navigation */}
       <Sidebar
         activeView={activeView}
@@ -201,10 +219,18 @@ export default function Home() {
         note={selectedNote}
         onSaveNote={handleSaveNote}
         onArchiveToggle={handleArchiveToggle}
-        onDeleteNote={(id) => setNoteToDeleteId(id)}
+        onDeleteNote={(id) => {
+          if (!user) {
+            openAuthModal('login');
+            return;
+          }
+          setNoteToDeleteId(id);
+        }}
         onBackMobile={() => setSelectedNoteId(null)}
         onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         isNewNoteMode={isNewNoteMode}
+        isGuest={!user}
+        onOpenAuth={() => openAuthModal('login')}
       />
 
       {/* Modals & Dialogs (Dynamic Imported) */}
