@@ -142,7 +142,7 @@ export function NoteList({
           <input
             ref={searchInputRef}
             type="search"
-            placeholder="Search title, content, or tags... (/)"
+            placeholder="Search notes... (/)"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-9 pr-8 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted) focus-ring"
@@ -271,15 +271,6 @@ export function NoteList({
         )}
       </div>
 
-      {/* Mobile Floating Action Button (FAB) */}
-      <button
-        onClick={onNewNote}
-        className="md:hidden fixed bottom-6 right-6 z-30 p-4 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl btn-interactive focus-ring flex items-center justify-center ring-2 ring-(--primary)/50"
-        aria-label="Create New Note"
-        title="Create New Note"
-      >
-        <Plus className="w-6 h-6" />
-      </button>
     </div>
   );
 }

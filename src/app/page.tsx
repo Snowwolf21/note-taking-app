@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { Plus } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 import { NoteList } from '@/components/NoteList';
 import { NoteEditor } from '@/components/NoteEditor';
@@ -215,26 +216,33 @@ export default function Home() {
       />
 
       {/* 3. Right Main Note Editor / Reader Panel */}
-      <NoteEditor
-        note={selectedNote}
-        onSaveNote={handleSaveNote}
-        onArchiveToggle={handleArchiveToggle}
-        onDeleteNote={(id) => {
-          if (!user) {
-            openAuthModal('login');
-            return;
-          }
-          setNoteToDeleteId(id);
-        }}
-        onBackMobile={() => {
-          setSelectedNoteId(null);
-          setIsNewNoteMode(false);
-        }}
-        onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
-        isNewNoteMode={isNewNoteMode}
-        isGuest={!user}
-        onOpenAuth={() => openAuthModal('login')}
-      />
+      {/* On mobile: hidden by default (NoteList is default). Shown only when a note is selected or new note mode is active. On md+ always visible. */}
+      <div
+        className={`flex-1 flex flex-col min-w-0 overflow-hidden ${
+          selectedNoteId !== null || isNewNoteMode ? 'flex' : 'hidden md:flex'
+        }`}
+      >
+        <NoteEditor
+          note={selectedNote}
+          onSaveNote={handleSaveNote}
+          onArchiveToggle={handleArchiveToggle}
+          onDeleteNote={(id) => {
+            if (!user) {
+              openAuthModal('login');
+              return;
+            }
+            setNoteToDeleteId(id);
+          }}
+          onBackMobile={() => {
+            setSelectedNoteId(null);
+            setIsNewNoteMode(false);
+          }}
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+          isNewNoteMode={isNewNoteMode}
+          isGuest={!user}
+          onOpenAuth={() => openAuthModal('login')}
+        />
+      </div>
 
       {/* Modals & Dialogs (Dynamic Imported) */}
       <SettingsModal
@@ -288,6 +296,19 @@ export default function Home() {
         onConfirm={handleDeleteConfirm}
         onClose={() => setNoteToDeleteId(null)}
       />
+
+      {/* Mobile FAB — create new note. Visible on mobile only, hidden when NoteEditor is active */}
+      {!(selectedNoteId !== null || isNewNoteMode) && (
+        <button
+          onClick={handleNewNote}
+          className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-6 py-3.5 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl btn-interactive focus-ring flex items-center space-x-2 ring-2 ring-(--primary)/40"
+          aria-label="Create New Note"
+          title="Create New Note"
+        >
+          <Plus className="w-5 h-5" />
+          <span className="text-sm font-bold">New Note</span>
+        </button>
+      )}
 
       {/* Floating & Draggable Settings & Theme Widget (All Viewports) */}
       <FloatingSettingsWidget onOpenSettings={openSettings} />

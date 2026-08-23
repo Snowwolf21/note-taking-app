@@ -130,8 +130,8 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
         }
       }}
       style={styleObj}
-      className={`fixed  z-50 p-1.5 md:p-2 lg:p-2.5 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl border border-white/20 focus-ring cursor-grab active:cursor-grabbing select-none transition-transform duration-75 btn-interactive ${
-        !position ? 'bottom-6 right-6' : ''
+      className={`fixed z-50 p-1.5 md:p-2 lg:p-2.5 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl border border-white/20 focus-ring cursor-grab active:cursor-grabbing select-none transition-transform duration-75 btn-interactive ${
+        !position ? 'bottom-20 right-4' : ''
       } ${
         isDragging ? 'scale-105 shadow-2xl ring-4 ring-(--primary)/50' : 'hover:scale-105 ring-2 ring-(--primary)/40'
       }`}
