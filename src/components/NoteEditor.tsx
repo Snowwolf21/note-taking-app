@@ -317,9 +317,6 @@ export function NoteEditor({
           <ArrowLeft className="w-5 h-5" />
           <span>Notes List</span>
         </button>
-        <span className="text-[11px] font-semibold text-(--text-muted) truncate max-w-[180px]">
-          {title || 'Untitled Note'}
-        </span>
       </div>
 
       {/* Main Scrollable Editor Area */}

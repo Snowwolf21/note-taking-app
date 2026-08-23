@@ -226,7 +226,10 @@ export default function Home() {
           }
           setNoteToDeleteId(id);
         }}
-        onBackMobile={() => setSelectedNoteId(null)}
+        onBackMobile={() => {
+          setSelectedNoteId(null);
+          setIsNewNoteMode(false);
+        }}
         onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         isNewNoteMode={isNewNoteMode}
         isGuest={!user}
