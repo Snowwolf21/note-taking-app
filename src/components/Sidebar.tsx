@@ -180,20 +180,6 @@ export function Sidebar({
 
         {/* Footer Settings & Account */}
         <div className="pt-4 border-t border-(--border-color) space-y-2">
-          {/* Appearance Settings CTA */}
-          <button
-            onClick={() => {
-              onOpenSettings();
-              onCloseMobile();
-            }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) btn-interactive focus-ring"
-          >
-            <div className="flex items-center space-x-3">
-              <Settings className="w-4 h-4 text-(--primary)" />
-              <span>Settings & Themes</span>
-            </div>
-          </button>
-
           {/* User Auth Section */}
           <div className="p-3 bg-(--bg-card) border border-(--border-color) rounded-xl space-y-2">
             {user ? (

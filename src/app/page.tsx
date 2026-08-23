@@ -9,11 +9,12 @@ import { NoteEditor } from '@/components/NoteEditor';
 import { useAppStore } from '@/store/useAppStore';
 import { useNotes } from '@/hooks/useNotes';
 
-// Dynamic lazy-loading for modals to split bundle size
+// Dynamic lazy-loading for modals & widgets to split bundle size
 const SettingsModal = dynamic(() => import('@/components/SettingsModal').then((m) => m.SettingsModal), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/AuthModal').then((m) => m.AuthModal), { ssr: false });
 const ForgotPasswordModal = dynamic(() => import('@/components/ForgotPasswordModal').then((m) => m.ForgotPasswordModal), { ssr: false });
 const ConfirmModal = dynamic(() => import('@/components/ConfirmModal').then((m) => m.ConfirmModal), { ssr: false });
+const FloatingSettingsWidget = dynamic(() => import('@/components/FloatingSettingsWidget').then((m) => m.FloatingSettingsWidget), { ssr: false });
 
 export default function Home() {
   // Store state & actions
@@ -258,6 +259,9 @@ export default function Home() {
         onConfirm={handleDeleteConfirm}
         onClose={() => setNoteToDeleteId(null)}
       />
+
+      {/* Floating & Draggable Settings & Theme Widget (All Viewports) */}
+      <FloatingSettingsWidget onOpenSettings={openSettings} />
     </div>
   );
 }
