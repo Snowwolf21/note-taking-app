@@ -154,18 +154,18 @@ export function AuthModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {view === 'register' && (
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-(--text-muted)">Full Name (Optional)</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-(--text-main) block">Full Name (Optional)</label>
               <div className="relative">
-                <UserIcon className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
+                <UserIcon className="w-5 h-5 absolute left-3 top-3 text-(--text-muted)" />
                 <input
                   type="text"
                   placeholder="Sarah Jenkins"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
+                  className="w-full pl-10 pr-3.5 py-2.5 text-base bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted)/60 focus-ring"
                 />
               </div>
             </div>
@@ -173,24 +173,24 @@ export function AuthModal({
 
           {(view === 'login' || view === 'register') && (
             <>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-(--text-muted)">Email Address *</label>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-(--text-main) block">Email Address *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
+                  <Mail className="w-5 h-5 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="email"
                     required
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-base bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted)/60 focus-ring"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-(--text-muted)">Password *</label>
+                  <label className="text-sm font-bold text-(--text-main) block">Password *</label>
                   {view === 'login' && (
                     <button
                       type="button"
@@ -198,14 +198,14 @@ export function AuthModal({
                         onClose();
                         onOpenForgotPassword();
                       }}
-                      className="text-xs text-(--primary) hover:underline focus-ring"
+                      className="text-xs font-semibold text-(--primary) hover:underline btn-interactive focus-ring"
                     >
                       Forgot password?
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
+                  <KeyRound className="w-5 h-5 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
@@ -213,7 +213,7 @@ export function AuthModal({
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-base bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted)/60 focus-ring"
                   />
                 </div>
               </div>
@@ -222,25 +222,25 @@ export function AuthModal({
 
           {view === 'changePassword' && (
             <>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-(--text-muted)">Current Password *</label>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-(--text-main) block">Current Password *</label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
+                  <KeyRound className="w-5 h-5 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
                     placeholder="••••••••"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-base bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted)/60 focus-ring"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-(--text-muted)">New Password *</label>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-(--text-main) block">New Password *</label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3 top-3 text-(--text-muted)" />
+                  <KeyRound className="w-5 h-5 absolute left-3 top-3 text-(--text-muted)" />
                   <input
                     type="password"
                     required
@@ -248,7 +248,7 @@ export function AuthModal({
                     placeholder="At least 6 characters"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-lg text-(--text-main) focus-ring"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-base bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted)/60 focus-ring"
                   />
                 </div>
               </div>
@@ -258,7 +258,7 @@ export function AuthModal({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
+            className="w-full py-3 px-4 bg-(--primary) text-(--primary-contrast) font-extrabold rounded-xl hover:opacity-90 btn-interactive focus-ring disabled:opacity-50 text-base shadow-md"
           >
             {loading
               ? 'Processing...'
@@ -271,7 +271,7 @@ export function AuthModal({
         </form>
 
         {view !== 'changePassword' && (
-          <div className="text-center pt-2 text-xs text-(--text-muted)">
+          <div className="text-center pt-2 text-sm text-(--text-muted)">
             {view === 'login' ? (
               <p>
                 Don't have an account?{' '}
@@ -280,7 +280,7 @@ export function AuthModal({
                     setView('register');
                     setError(null);
                   }}
-                  className="font-semibold text-(--primary) hover:underline focus-ring"
+                  className="font-bold text-(--primary) hover:underline btn-interactive focus-ring"
                 >
                   Create one now
                 </button>
@@ -293,7 +293,7 @@ export function AuthModal({
                     setView('login');
                     setError(null);
                   }}
-                  className="font-semibold text-(--primary) hover:underline focus-ring"
+                  className="font-bold text-(--primary) hover:underline btn-interactive focus-ring"
                 >
                   Sign in here
                 </button>

@@ -1,50 +1,51 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { Sidebar } from '@/components/Sidebar';
 import { NoteList } from '@/components/NoteList';
 import { NoteEditor } from '@/components/NoteEditor';
-import { SettingsModal } from '@/components/SettingsModal';
-import { AuthModal } from '@/components/AuthModal';
-import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
-import { ConfirmModal } from '@/components/ConfirmModal';
 
 import { useAppStore } from '@/store/useAppStore';
 import { useNotes } from '@/hooks/useNotes';
 
+// Dynamic lazy-loading for modals to split bundle size
+const SettingsModal = dynamic(() => import('@/components/SettingsModal').then((m) => m.SettingsModal), { ssr: false });
+const AuthModal = dynamic(() => import('@/components/AuthModal').then((m) => m.AuthModal), { ssr: false });
+const ForgotPasswordModal = dynamic(() => import('@/components/ForgotPasswordModal').then((m) => m.ForgotPasswordModal), { ssr: false });
+const ConfirmModal = dynamic(() => import('@/components/ConfirmModal').then((m) => m.ConfirmModal), { ssr: false });
+
 export default function Home() {
   // Store state & actions
-  const {
-    activeView,
-    setActiveView,
-    activeTag,
-    setActiveTag,
-    searchQuery,
-    setSearchQuery,
-    selectedNoteId,
-    setSelectedNoteId,
-    isNewNoteMode,
-    setIsNewNoteMode,
-    mobileSidebarOpen,
-    setMobileSidebarOpen,
-    colorTheme,
-    setColorTheme,
-    fontTheme,
-    setFontTheme,
-    user,
-    setUser,
-    isSettingsOpen,
-    openSettings,
-    closeSettings,
-    authModal,
-    openAuthModal,
-    closeAuthModal,
-    isForgotPasswordOpen,
-    openForgotPassword,
-    closeForgotPassword,
-    noteToDeleteId,
-    setNoteToDeleteId,
-  } = useAppStore();
+  const activeView = useAppStore((s) => s.activeView);
+  const setActiveView = useAppStore((s) => s.setActiveView);
+  const activeTag = useAppStore((s) => s.activeTag);
+  const setActiveTag = useAppStore((s) => s.setActiveTag);
+  const searchQuery = useAppStore((s) => s.searchQuery);
+  const setSearchQuery = useAppStore((s) => s.setSearchQuery);
+  const selectedNoteId = useAppStore((s) => s.selectedNoteId);
+  const setSelectedNoteId = useAppStore((s) => s.setSelectedNoteId);
+  const isNewNoteMode = useAppStore((s) => s.isNewNoteMode);
+  const setIsNewNoteMode = useAppStore((s) => s.setIsNewNoteMode);
+  const mobileSidebarOpen = useAppStore((s) => s.mobileSidebarOpen);
+  const setMobileSidebarOpen = useAppStore((s) => s.setMobileSidebarOpen);
+  const colorTheme = useAppStore((s) => s.colorTheme);
+  const setColorTheme = useAppStore((s) => s.setColorTheme);
+  const fontTheme = useAppStore((s) => s.fontTheme);
+  const setFontTheme = useAppStore((s) => s.setFontTheme);
+  const user = useAppStore((s) => s.user);
+  const setUser = useAppStore((s) => s.setUser);
+  const isSettingsOpen = useAppStore((s) => s.isSettingsOpen);
+  const openSettings = useAppStore((s) => s.openSettings);
+  const closeSettings = useAppStore((s) => s.closeSettings);
+  const authModal = useAppStore((s) => s.authModal);
+  const openAuthModal = useAppStore((s) => s.openAuthModal);
+  const closeAuthModal = useAppStore((s) => s.closeAuthModal);
+  const isForgotPasswordOpen = useAppStore((s) => s.isForgotPasswordOpen);
+  const openForgotPassword = useAppStore((s) => s.openForgotPassword);
+  const closeForgotPassword = useAppStore((s) => s.closeForgotPassword);
+  const noteToDeleteId = useAppStore((s) => s.noteToDeleteId);
+  const setNoteToDeleteId = useAppStore((s) => s.setNoteToDeleteId);
 
   // Server state & mutations via TanStack Query
   const { notes, saveNote, archiveToggle, deleteNote } = useNotes();
@@ -151,7 +152,7 @@ export default function Home() {
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-(--bg-main) font-(--font-family-active)">
+    <div className="flex h-dvh w-full overflow-hidden bg-(--bg-main) font-(--font-family-active)">
       {/* 1. Left Sidebar Navigation */}
       <Sidebar
         activeView={activeView}
@@ -186,10 +187,12 @@ export default function Home() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         activeTag={activeTag}
+        onSelectTag={setActiveTag}
         onClearTag={() => setActiveTag(null)}
         activeView={activeView}
         onNewNote={handleNewNote}
         onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+        isNewNoteMode={isNewNoteMode}
       />
 
       {/* 3. Right Main Note Editor / Reader Panel */}
@@ -199,10 +202,11 @@ export default function Home() {
         onArchiveToggle={handleArchiveToggle}
         onDeleteNote={(id) => setNoteToDeleteId(id)}
         onBackMobile={() => setSelectedNoteId(null)}
+        onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         isNewNoteMode={isNewNoteMode}
       />
 
-      {/* Modals & Dialogs */}
+      {/* Modals & Dialogs (Dynamic Imported) */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={closeSettings}

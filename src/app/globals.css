@@ -103,7 +103,18 @@
   background: var(--text-muted);
 }
 
+/* Base Button Rules */
+button {
+  cursor: pointer;
+}
+
 /* Focus Ring Utility */
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--bg-main);
 }
+
+/* Interactive Micro-animation Utility */
+.btn-interactive {
+  @apply cursor-pointer transition-all duration-150 active:scale-95 hover:scale-[1.02];
+}
+

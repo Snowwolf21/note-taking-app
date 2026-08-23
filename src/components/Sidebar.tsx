@@ -84,7 +84,7 @@ export function Sidebar({
               onNewNote();
               onCloseMobile();
             }}
-            className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-(--primary) text-(--primary-contrast) font-bold text-sm rounded-xl hover:opacity-90 transition-all duration-150 shadow-md focus-ring"
+            className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-(--primary) text-(--primary-contrast) font-bold text-sm rounded-xl hover:opacity-90 btn-interactive focus-ring shadow-md"
             aria-label="Create New Note (Keyboard shortcut Command N)"
           >
             <Plus className="w-5 h-5" />
@@ -99,7 +99,7 @@ export function Sidebar({
                 onSelectTag(null);
                 onCloseMobile();
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors focus-ring ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold btn-interactive focus-ring ${
                 activeView === 'all' && activeTag === null
                   ? 'bg-(--primary)/15 text-(--primary) border border-(--primary)/30'
                   : 'text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
@@ -120,7 +120,7 @@ export function Sidebar({
                 onSelectTag(null);
                 onCloseMobile();
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors focus-ring ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold btn-interactive focus-ring ${
                 activeView === 'archived' && activeTag === null
                   ? 'bg-(--primary)/15 text-(--primary) border border-(--primary)/30'
                   : 'text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
@@ -160,7 +160,7 @@ export function Sidebar({
                         onSelectTag(tag);
                         onCloseMobile();
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors focus-ring ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm btn-interactive focus-ring ${
                         isSelected
                           ? 'bg-(--primary)/20 text-(--primary) font-bold'
                           : 'text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
@@ -186,7 +186,7 @@ export function Sidebar({
               onOpenSettings();
               onCloseMobile();
             }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) transition-colors focus-ring"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) btn-interactive focus-ring"
           >
             <div className="flex items-center space-x-3">
               <Settings className="w-4 h-4 text-(--primary)" />
@@ -212,14 +212,14 @@ export function Sidebar({
                 <div className="flex items-center gap-1 pt-1 border-t border-(--border-color)">
                   <button
                     onClick={() => onOpenAuth('changePassword')}
-                    className="flex-1 px-2 py-1 text-[11px] font-semibold text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) rounded border border-(--border-color) flex items-center justify-center space-x-1 focus-ring"
+                    className="flex-1 px-2 py-1 text-[11px] font-semibold text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) rounded border border-(--border-color) flex items-center justify-center space-x-1 btn-interactive focus-ring"
                   >
                     <Key className="w-3 h-3" />
                     <span>Password</span>
                   </button>
                   <button
                     onClick={onLogout}
-                    className="px-2 py-1 text-[11px] font-semibold text-red-400 hover:bg-red-500/10 rounded border border-red-500/30 flex items-center space-x-1 focus-ring"
+                    className="px-2 py-1 text-[11px] font-semibold text-red-400 hover:bg-red-500/10 rounded border border-red-500/30 flex items-center space-x-1 btn-interactive focus-ring"
                   >
                     <LogOut className="w-3 h-3" />
                     <span>Logout</span>
@@ -231,7 +231,7 @@ export function Sidebar({
                 <p className="text-xs text-(--text-muted)">Cloud sync disabled (Guest mode)</p>
                 <button
                   onClick={() => onOpenAuth('login')}
-                  className="w-full py-1.5 px-3 bg-(--bg-surface-hover) hover:bg-(--primary) hover:text-(--primary-contrast) font-semibold text-xs rounded-lg transition-colors focus-ring border border-(--border-color) flex items-center justify-center space-x-1.5"
+                  className="w-full py-1.5 px-3 bg-(--bg-surface-hover) hover:bg-(--primary) hover:text-(--primary-contrast) font-semibold text-xs rounded-lg transition-colors btn-interactive focus-ring border border-(--border-color) flex items-center justify-center space-x-1.5"
                 >
                   <User className="w-3.5 h-3.5" />
                   <span>Sign In / Create Account</span>

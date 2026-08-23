@@ -61,7 +61,7 @@ export function SettingsModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) focus-ring"
+            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) btn-interactive focus-ring"
             aria-label="Close settings"
           >
             <X className="w-5 h-5" />
@@ -82,7 +82,7 @@ export function SettingsModal({
                 <button
                   key={opt.id}
                   onClick={() => onSelectColorTheme(opt.id)}
-                  className={`flex flex-col text-left p-3.5 rounded-xl border transition-all duration-150 focus-ring ${
+                  className={`flex flex-col text-left p-3.5 rounded-xl border btn-interactive focus-ring ${
                     isSelected
                       ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary)'
                       : 'border-(--border-color) bg-(--bg-card) hover:bg-(--bg-surface-hover)'
@@ -117,7 +117,7 @@ export function SettingsModal({
                 <button
                   key={opt.id}
                   onClick={() => onSelectFontTheme(opt.id)}
-                  className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left transition-all duration-150 focus-ring ${
+                  className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left btn-interactive focus-ring ${
                     isSelected
                       ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary)'
                       : 'border-(--border-color) bg-(--bg-card) hover:bg-(--bg-surface-hover)'
@@ -150,7 +150,7 @@ export function SettingsModal({
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-(--primary) text-(--primary-contrast) hover:opacity-90 focus-ring"
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-(--primary) text-(--primary-contrast) hover:opacity-90 btn-interactive focus-ring"
           >
             Done
           </button>

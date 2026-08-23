@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Save,
   Archive,
@@ -15,6 +15,7 @@ import {
   Eye,
   Edit3,
   ArrowLeft,
+  Menu,
 } from 'lucide-react';
 import { NoteItem } from './NoteList';
 
@@ -24,6 +25,7 @@ interface NoteEditorProps {
   onArchiveToggle: (id: string, currentArchived: boolean) => Promise<void>;
   onDeleteNote: (id: string) => void;
   onBackMobile: () => void;
+  onOpenMobileSidebar?: () => void;
   isNewNoteMode?: boolean;
 }
 
@@ -33,6 +35,7 @@ export function NoteEditor({
   onArchiveToggle,
   onDeleteNote,
   onBackMobile,
+  onOpenMobileSidebar,
   isNewNoteMode = false,
 }: NoteEditorProps) {
   const [title, setTitle] = useState('');
@@ -149,9 +152,18 @@ export function NoteEditor({
     }
   };
 
+  // Memoized character and word count calculations
+  const { charCount, wordCount } = useMemo(() => {
+    const trimmed = content.trim();
+    return {
+      charCount: content.length,
+      wordCount: trimmed ? trimmed.split(/\s+/).length : 0,
+    };
+  }, [content]);
+
   if (!note && !isNewNoteMode) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-(--bg-main) text-(--text-muted) space-y-3">
+      <div className="hidden lg:flex flex-1 flex-col items-center justify-center p-8 text-center bg-(--bg-main) text-(--text-muted) space-y-3">
         <div className="p-4 bg-(--bg-surface) rounded-2xl border border-(--border-color) shadow-sm">
           <Edit3 className="w-10 h-10 text-(--primary) mx-auto opacity-50" />
         </div>
@@ -163,17 +175,25 @@ export function NoteEditor({
     );
   }
 
-  const charCount = content.length;
-  const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
-
   return (
-    <div className="flex-1 flex flex-col h-full bg-(--bg-main) overflow-hidden" aria-label="Note Editor View">
+    <div className="flex-1 flex flex-col h-full w-full bg-(--bg-main) overflow-hidden" aria-label="Note Editor View">
       {/* Top Action Bar */}
       <div className="px-4 py-3 bg-(--bg-surface) border-b border-(--border-color) flex items-center justify-between gap-3 shrink-0 flex-wrap">
         <div className="flex items-center space-x-2">
+          {onOpenMobileSidebar && (
+            <button
+              onClick={onOpenMobileSidebar}
+              className="p-1.5 rounded-lg text-(--text-main) bg-(--bg-card) border border-(--border-color) hover:bg-(--bg-surface-hover) lg:hidden btn-interactive focus-ring shadow-xs flex items-center justify-center"
+              aria-label="Open sidebar drawer"
+              title="Open navigation menu"
+            >
+              <Menu className="w-5 h-5 text-(--primary)" />
+            </button>
+          )}
+
           <button
             onClick={onBackMobile}
-            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) lg:hidden focus-ring"
+            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) md:hidden btn-interactive focus-ring"
             aria-label="Back to note list"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -183,7 +203,7 @@ export function NoteEditor({
           <div className="flex items-center p-1 bg-(--bg-card) border border-(--border-color) rounded-xl">
             <button
               onClick={() => setMode('edit')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition-colors focus-ring ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 btn-interactive focus-ring ${
                 mode === 'edit'
                   ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
                   : 'text-(--text-muted) hover:text-(--text-main)'
@@ -194,7 +214,7 @@ export function NoteEditor({
             </button>
             <button
               onClick={() => setMode('preview')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition-colors focus-ring ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1.5 btn-interactive focus-ring ${
                 mode === 'preview'
                   ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
                   : 'text-(--text-muted) hover:text-(--text-main)'
@@ -212,7 +232,7 @@ export function NoteEditor({
           {note?.id && (
             <button
               onClick={() => onArchiveToggle(note.id, isArchived)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl border flex items-center space-x-1.5 transition-colors focus-ring ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl border flex items-center space-x-1.5 btn-interactive focus-ring ${
                 isArchived
                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
                   : 'bg-(--bg-card) text-(--text-muted) border-(--border-color) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
@@ -228,7 +248,7 @@ export function NoteEditor({
           {note?.id && (
             <button
               onClick={() => onDeleteNote(note.id)}
-              className="px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors focus-ring flex items-center space-x-1.5"
+              className="px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 btn-interactive focus-ring flex items-center space-x-1.5"
               title="Delete Note"
             >
               <Trash2 className="w-4 h-4" />
@@ -236,11 +256,11 @@ export function NoteEditor({
             </button>
           )}
 
-          {/* Save Note CTA */}
+          {/* Save Note CTA (Tablet & Desktop) */}
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-1.5 text-xs font-bold bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 transition-opacity focus-ring shadow-sm flex items-center space-x-1.5 disabled:opacity-50"
+            className="hidden md:flex px-4 py-1.5 text-xs font-bold bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 btn-interactive focus-ring shadow-sm items-center space-x-1.5 disabled:opacity-50"
             title="Save changes (Cmd+S)"
           >
             <Save className="w-4 h-4" />
@@ -304,7 +324,7 @@ export function NoteEditor({
                 <span>#{tag}</span>
                 <button
                   onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-red-400 focus-ring rounded"
+                  className="hover:text-red-400 btn-interactive focus-ring rounded"
                   aria-label={`Remove tag ${tag}`}
                 >
                   <X className="w-3 h-3" />
@@ -324,7 +344,7 @@ export function NoteEditor({
               {tagInput.trim() && (
                 <button
                   onClick={handleAddTag}
-                  className="p-1 text-(--primary) hover:bg-(--primary)/10 rounded focus-ring"
+                  className="p-1 text-(--primary) hover:bg-(--primary)/10 rounded btn-interactive focus-ring"
                   title="Add tag"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -373,6 +393,18 @@ export function NoteEditor({
               {content || <span className="text-(--text-muted) italic">No content written yet.</span>}
             </div>
           )}
+        </div>
+
+        {/* Bottom Save Note CTA (Mobile Only) */}
+        <div className="pt-4 border-t border-(--border-color) md:hidden">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full py-3 px-4 bg-(--primary) text-(--primary-contrast) font-bold text-sm rounded-xl hover:opacity-90 btn-interactive focus-ring shadow-md flex items-center justify-center space-x-2 disabled:opacity-50"
+          >
+            <Save className="w-5 h-5" />
+            <span>{saving ? 'Saving Note...' : 'Save Note'}</span>
+          </button>
         </div>
       </div>
     </div>

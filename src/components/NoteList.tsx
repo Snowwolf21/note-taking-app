@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Search, Plus, Tag, Calendar, Archive, FileText, Menu, X } from 'lucide-react';
 
 export interface NoteItem {
@@ -20,10 +20,12 @@ interface NoteListProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
   activeTag: string | null;
+  onSelectTag?: (tag: string | null) => void;
   onClearTag: () => void;
   activeView: 'all' | 'archived';
   onNewNote: () => void;
   onOpenMobileSidebar: () => void;
+  isNewNoteMode?: boolean;
 }
 
 export function NoteList({
@@ -33,13 +35,36 @@ export function NoteList({
   searchQuery,
   onSearchChange,
   activeTag,
+  onSelectTag,
   onClearTag,
   activeView,
   onNewNote,
   onOpenMobileSidebar,
+  isNewNoteMode = false,
 }: NoteListProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  // Extract unique available tags for horizontal pill navigation
+  const availableTags = Array.from(
+    new Set(notes.flatMap((n) => (Array.isArray(n.tags) ? n.tags : [])))
+  );
+
+  // Sync local search state when prop changes externally (e.g. cleared)
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  // Debounce search input by 300ms before calling parent onSearchChange
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchQuery, onSearchChange]);
 
   // Keyboard shortcut `/` to focus search
   useEffect(() => {
@@ -80,7 +105,9 @@ export function NoteList({
 
   return (
     <div
-      className="w-full lg:w-80 xl:w-96 bg-(--bg-surface) border-r border-(--border-color) flex flex-col h-full shrink-0"
+      className={`w-full md:w-80 xl:w-96 bg-(--bg-surface) border-r border-(--border-color) flex-col h-full shrink-0 relative ${
+        selectedNoteId !== null && !isNewNoteMode ? 'hidden md:flex' : 'flex'
+      }`}
       aria-label="Notes Directory"
     >
       {/* Header section with search and title */}
@@ -89,10 +116,11 @@ export function NoteList({
           <div className="flex items-center space-x-2">
             <button
               onClick={onOpenMobileSidebar}
-              className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) lg:hidden focus-ring"
+              className="p-1.5 rounded-lg text-(--text-main) bg-(--bg-card) border border-(--border-color) hover:bg-(--bg-surface-hover) lg:hidden btn-interactive focus-ring shadow-xs flex items-center justify-center"
               aria-label="Open sidebar drawer"
+              title="Open navigation menu"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 text-(--primary)" />
             </button>
             <h2 className="text-xl font-bold text-(--text-main) capitalize">
               {activeView === 'archived' ? 'Archived Notes' : 'All Notes'}
@@ -100,7 +128,7 @@ export function NoteList({
           </div>
           <button
             onClick={onNewNote}
-            className="p-2 bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 transition-opacity focus-ring shadow-sm"
+            className="p-2 bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 btn-interactive focus-ring shadow-sm"
             title="Create New Note (Cmd+N)"
             aria-label="Create New Note"
           >
@@ -115,21 +143,41 @@ export function NoteList({
             ref={searchInputRef}
             type="search"
             placeholder="Search title, content, or tags... (/)"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-9 pr-8 py-2 text-sm bg-(--bg-card) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted) focus-ring"
             aria-label="Search notes by title, tag, or content"
           />
-          {/* {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-2.5 top-2.5 text-(--text-muted) hover:text-(--text-main) focus-ring p-0.5 rounded"
-              aria-label="Clear search query"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )} */}
         </div>
+
+        {/* Horizontal Scrollable Tag Pills Bar */}
+        {availableTags.length > 0 && (
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none scroll-smooth">
+            <button
+              onClick={onClearTag}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg shrink-0 btn-interactive focus-ring transition-colors ${
+                activeTag === null
+                  ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
+                  : 'bg-(--bg-card) text-(--text-muted) border border-(--border-color) hover:text-(--text-main)'
+              }`}
+            >
+              #All
+            </button>
+            {availableTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => (onSelectTag ? onSelectTag(tag) : null)}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg shrink-0 btn-interactive focus-ring transition-colors ${
+                  activeTag === tag
+                    ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
+                    : 'bg-(--bg-card) text-(--text-muted) border border-(--border-color) hover:text-(--text-main)'
+                }`}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Active Tag Filter Indicator */}
         {activeTag && (
@@ -140,7 +188,7 @@ export function NoteList({
             </span>
             <button
               onClick={onClearTag}
-              className="text-(--primary) hover:underline focus-ring text-xs font-bold"
+              className="text-(--primary) hover:underline btn-interactive focus-ring text-xs font-bold"
             >
               Clear
             </button>
@@ -180,9 +228,9 @@ export function NoteList({
               <button
                 key={note.id}
                 onClick={() => onSelectNote(note.id)}
-                className={`w-full text-left p-3.5 rounded-xl border transition-all duration-150 focus-ring space-y-2 ${
+                className={`w-full text-left p-3.5 rounded-xl border btn-interactive focus-ring space-y-2 ${
                   isSelected
-                    ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary) shadow-sm'
+                    ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary) shadow-sm font-semibold'
                     : 'border-(--border-color) bg-(--bg-card) hover:bg-(--bg-surface-hover)'
                 }`}
                 aria-selected={isSelected}
@@ -222,6 +270,16 @@ export function NoteList({
           })
         )}
       </div>
+
+      {/* Mobile Floating Action Button (FAB) */}
+      <button
+        onClick={onNewNote}
+        className="md:hidden fixed bottom-6 right-6 z-30 p-4 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl btn-interactive focus-ring flex items-center justify-center ring-2 ring-(--primary)/50"
+        aria-label="Create New Note"
+        title="Create New Note"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   );
 }

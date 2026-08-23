@@ -86,13 +86,13 @@ export function ForgotPasswordModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="forgot-password-title"
     >
-      <div className="w-full max-w-md bg-(--bg-surface) border border-(--border-color) rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
-        <div className="flex items-center justify-between border-b border-(--border-color) pb-3">
+      <div className="w-full max-w-lg max-h-[70vh] bg-(--bg-surface) border border-(--border-color) rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="flex items-center justify-between gap-2 border-b border-(--border-color)  pb-3">
           <h2 id="forgot-password-title" className="text-xl font-bold text-(--text-main) flex items-center space-x-2">
             <RefreshCw className="w-5 h-5 text-(--primary)" />
             <span>Reset Your Password</span>
@@ -107,7 +107,7 @@ export function ForgotPasswordModal({
         </div>
 
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm flex items-center space-x-2">
+          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm flex items-center  space-x-2">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{error}</span>
           </div>
@@ -183,7 +183,7 @@ export function ForgotPasswordModal({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 transition-opacity focus-ring disabled:opacity-50 text-sm shadow-md"
+              className="w-full py-2.5 px-4 bg-(--primary) text-(--primary-contrast) font-semibold rounded-lg hover:opacity-90 btn-interactive focus-ring disabled:opacity-50 text-sm shadow-md"
             >
               {loading ? 'Updating password...' : 'Save New Password & Sign In'}
             </button>
@@ -197,7 +197,7 @@ export function ForgotPasswordModal({
               onClose();
               onOpenLogin();
             }}
-            className="font-semibold text-(--primary) hover:underline focus-ring"
+            className="font-semibold text-(--primary) hover:underline btn-interactive focus-ring"
           >
             Back to Sign In
           </button>

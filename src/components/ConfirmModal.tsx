@@ -62,7 +62,7 @@ export function ConfirmModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) focus-ring"
+            className="p-1 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) btn-interactive focus-ring"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -74,14 +74,14 @@ export function ConfirmModal({
         <div className="flex items-center justify-end space-x-3 pt-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium rounded-lg text-(--text-main) bg-(--bg-surface-hover) hover:opacity-90 focus-ring"
+            className="px-4 py-2 text-sm font-medium rounded-lg text-(--text-main) bg-(--bg-surface-hover) hover:opacity-90 btn-interactive focus-ring"
           >
             {cancelLabel}
           </button>
           <button
             ref={confirmBtnRef}
             onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus-ring shadow-sm"
+            className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 btn-interactive focus-ring shadow-sm"
           >
             {confirmLabel}
           </button>
