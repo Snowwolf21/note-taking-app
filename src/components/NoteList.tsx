@@ -106,7 +106,7 @@ export function NoteList({
   return (
     <div
       className={`w-full md:w-80 xl:w-96 bg-(--bg-surface) border-r border-(--border-color) flex-col h-full shrink-0 relative ${
-        selectedNoteId !== null && !isNewNoteMode ? 'hidden md:flex' : 'flex'
+        selectedNoteId !== null || isNewNoteMode ? 'hidden md:flex' : 'flex'
       }`}
       aria-label="Notes Directory"
     >

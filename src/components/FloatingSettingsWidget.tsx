@@ -14,28 +14,40 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
   const hasMovedRef = useRef(false);
   const widgetRef = useRef<HTMLButtonElement>(null);
 
-  // Set initial position at bottom-right corner on first client render
-  useEffect(() => {
-    const initialX = Math.max(16, window.innerWidth - 80);
-    const initialY = Math.max(16, window.innerHeight - 80);
-    setPosition({ x: initialX, y: initialY });
-  }, []);
+  const prevBracketRef = useRef<string | null>(null);
 
-  // Recalculate clamped position on window resize
+  // Helper to determine viewport category (mobile < 768px, tablet 768-1023px, desktop >= 1024px)
+  const getViewportBracket = (width: number) => {
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
+  };
+
+  // Reset position to initial default (bottom-6 right-6) whenever viewport breakpoint changes
   useEffect(() => {
+    prevBracketRef.current = getViewportBracket(window.innerWidth);
+
     const handleResize = () => {
-      if (!position) return;
-      const maxX = window.innerWidth - 64;
-      const maxY = window.innerHeight - 64;
-      setPosition((prev) =>
-        prev
-          ? {
-              x: Math.min(Math.max(16, prev.x), maxX),
-              y: Math.min(Math.max(16, prev.y), maxY),
-            }
-          : null
-      );
+      const currentBracket = getViewportBracket(window.innerWidth);
+      if (prevBracketRef.current && prevBracketRef.current !== currentBracket) {
+        // Viewport crossed breakpoint boundary -> return to initial position
+        setPosition(null);
+        prevBracketRef.current = currentBracket;
+      } else if (position) {
+        // Same bracket -> clamp position within screen bounds
+        const maxX = window.innerWidth - 64;
+        const maxY = window.innerHeight - 64;
+        setPosition((prev) =>
+          prev
+            ? {
+                x: Math.min(Math.max(16, prev.x), maxX),
+                y: Math.min(Math.max(16, prev.y), maxY),
+              }
+            : null
+        );
+      }
     };
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [position]);
@@ -85,6 +97,9 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
   const handleStart = (clientX: number, clientY: number) => {
     if (!widgetRef.current) return;
     const rect = widgetRef.current.getBoundingClientRect();
+    if (!position) {
+      setPosition({ x: rect.left, y: rect.top });
+    }
     dragOffsetRef.current = {
       x: clientX - rect.left,
       y: clientY - rect.top,
@@ -100,7 +115,9 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
     }
   };
 
-  if (!position) return null;
+  const styleObj = position
+    ? { left: `${position.x}px`, top: `${position.y}px` }
+    : undefined;
 
   return (
     <button
@@ -112,17 +129,16 @@ export function FloatingSettingsWidget({ onOpenSettings }: FloatingSettingsWidge
           handleStart(e.touches[0].clientX, e.touches[0].clientY);
         }
       }}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-      }}
-      className={`fixed z-50 p-3.5 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl border border-white/20 focus-ring cursor-grab active:cursor-grabbing select-none transition-transform duration-75 btn-interactive ${
-        isDragging ? 'scale-110 shadow-2xl ring-4 ring-(--primary)/50' : 'hover:scale-105 ring-2 ring-(--primary)/40'
+      style={styleObj}
+      className={`fixed  z-50 p-1.5 md:p-2 lg:p-2.5 bg-(--primary) text-(--primary-contrast) rounded-full shadow-2xl border border-white/20 focus-ring cursor-grab active:cursor-grabbing select-none transition-transform duration-75 btn-interactive ${
+        !position ? 'bottom-6 right-6' : ''
+      } ${
+        isDragging ? 'scale-105 shadow-2xl ring-4 ring-(--primary)/50' : 'hover:scale-105 ring-2 ring-(--primary)/40'
       }`}
       title="Drag anywhere or click for Settings & Themes"
       aria-label="Appearance & Theme Settings Widget (Draggable)"
     >
-      <Settings className={`w-6 h-6 ${isDragging ? 'bg-(--primary)/15' : ''}`} />
+      <Settings className={`w-8 h-8 ${isDragging ? 'animate-spin' : ''}`} />
     </button>
   );
 }

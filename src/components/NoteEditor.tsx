@@ -172,7 +172,7 @@ export function NoteEditor({
 
   if (!note && !isNewNoteMode) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-(--bg-main) space-y-4" aria-label="No Note Selected">
+      <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center bg-(--bg-main) space-y-4" aria-label="No Note Selected">
         <div className="p-4 bg-(--bg-surface) border border-(--border-color) rounded-2xl shadow-sm text-(--primary)">
           <Calendar className="w-10 h-10" />
         </div>
@@ -206,13 +206,16 @@ export function NoteEditor({
       {/* Top Action Bar */}
       <div className="px-4 py-3 bg-(--bg-surface) border-b border-(--border-color) flex items-center justify-between gap-3 shrink-0 flex-wrap">
         <div className="flex items-center space-x-2">
-          <button
-            onClick={onBackMobile}
-            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-surface-hover) md:hidden btn-interactive focus-ring"
-            aria-label="Back to note list"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+          {onOpenMobileSidebar && (
+            <button
+              onClick={onOpenMobileSidebar}
+              className="p-1.5 rounded-lg text-(--text-main) bg-(--bg-card) border border-(--border-color) hover:bg-(--bg-surface-hover) lg:hidden btn-interactive focus-ring shadow-xs flex items-center justify-center"
+              aria-label="Open sidebar drawer"
+              title="Open navigation menu"
+            >
+              <Menu className="w-5 h-5 text-(--primary)" />
+            </button>
+          )}
 
           {/* Mode Switcher */}
           <div className="flex items-center p-1 bg-(--bg-card) border border-(--border-color) rounded-xl">
@@ -304,7 +307,22 @@ export function NoteEditor({
         </div>
       )}
 
-      {/* Main Content Form */}
+      {/* Mobile Back Navigation Sub-Bar */}
+      <div className="px-4 py-2 bg-(--bg-card) border-b border-(--border-color) flex items-center justify-between md:hidden shrink-0">
+        <button
+          onClick={onBackMobile}
+          className="flex items-center space-x-2 text-xs font-bold text-(--primary) hover:underline btn-interactive focus-ring"
+          aria-label="Back to note list"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Notes List</span>
+        </button>
+        <span className="text-[11px] font-semibold text-(--text-muted) truncate max-w-[180px]">
+          {title || 'Untitled Note'}
+        </span>
+      </div>
+
+      {/* Main Scrollable Editor Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-4xl w-full mx-auto">
         {/* Title Input */}
         <div className="space-y-1">
