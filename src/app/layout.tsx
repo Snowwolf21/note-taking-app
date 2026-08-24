@@ -7,18 +7,21 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  // Inter is the default active font — preload it eagerly
 });
 
 const lora = Lora({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
+  preload: false, // Only loaded when user switches to serif theme
 });
 
 const firaCode = Fira_Code({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  preload: false, // Only loaded when user switches to mono theme
 });
 
 export const metadata: Metadata = {
