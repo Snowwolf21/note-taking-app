@@ -116,7 +116,7 @@ export async function GET(req: Request) {
       orderBy: { updatedAt: 'desc' },
     });
 
-    let formattedNotes = notes.map((n) => ({
+    let formattedNotes = (notes as any[]).map((n) => ({
       ...n,
       tags: typeof n.tags === 'string' ? JSON.parse(n.tags || '[]') : n.tags,
     }));
