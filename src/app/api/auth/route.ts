@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { randomInt } from 'crypto';
 import { db } from '@/lib/db';
 import {
@@ -10,6 +11,40 @@ import {
   getCurrentUser,
 } from '@/lib/auth';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+
+// ─── Zod Schemas ─────────────────────────────────────────────────────────────
+
+const RegisterSchema = z.object({
+  email: z.string().email('Invalid email format').max(254),
+  password: z.string().min(6, 'Password must be at least 6 characters').max(128),
+  name: z.string().max(100).optional(),
+});
+
+const LoginSchema = z.object({
+  email: z.string().email('Invalid email format').max(254),
+  password: z.string().min(1, 'Password is required').max(128),
+});
+
+const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters').max(128),
+});
+
+const ForgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email format').max(254),
+});
+
+const ResetPasswordSchema = z.object({
+  email: z.string().email('Invalid email format').max(254),
+  code: z.string().length(6, 'Reset code must be exactly 6 digits'),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters').max(128),
+});
+
+const UpdateSettingsSchema = z.object({
+  colorTheme: z.string().max(20).optional(),
+  fontTheme: z.string().max(20).optional(),
+});
+
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -39,13 +74,11 @@ export async function POST(req: Request) {
 
     // 1. REGISTER
     if (action === 'register') {
-      const { email, password, name } = body;
-      if (!email || !password || password.length < 6) {
-        return NextResponse.json(
-          { error: 'Email and password (min 6 chars) are required.' },
-          { status: 400 }
-        );
+      const parsed = RegisterSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
+      const { email, password, name } = parsed.data;
 
       const existingUser = await db.user.findUnique({
         where: { email: email.toLowerCase().trim() },
@@ -83,13 +116,11 @@ export async function POST(req: Request) {
 
     // 2. LOGIN
     if (action === 'login') {
-      const { email, password } = body;
-      if (!email || !password) {
-        return NextResponse.json(
-          { error: 'Email and password are required.' },
-          { status: 400 }
-        );
+      const parsed = LoginSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
+      const { email, password } = parsed.data;
 
       const user = await db.user.findUnique({
         where: { email: email.toLowerCase().trim() },
@@ -136,14 +167,11 @@ export async function POST(req: Request) {
       if (!currentUser) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-
-      const { currentPassword, newPassword } = body;
-      if (!currentPassword || !newPassword || newPassword.length < 6) {
-        return NextResponse.json(
-          { error: 'New password must be at least 6 characters.' },
-          { status: 400 }
-        );
+      const parsed = ChangePasswordSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
+      const { currentPassword, newPassword } = parsed.data;
 
       const user = await db.user.findUnique({ where: { id: currentUser.id } });
       if (!user) {
@@ -169,13 +197,11 @@ export async function POST(req: Request) {
 
     // 5. FORGOT PASSWORD (Generate Reset Token)
     if (action === 'forgot-password') {
-      const { email } = body;
-      if (!email) {
-        return NextResponse.json(
-          { error: 'Email address is required.' },
-          { status: 400 }
-        );
+      const parsed = ForgotPasswordSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
+      const { email } = parsed.data;
 
       const user = await db.user.findUnique({
         where: { email: email.toLowerCase().trim() },
@@ -207,13 +233,11 @@ export async function POST(req: Request) {
 
     // 6. RESET PASSWORD (Validate Code & Update Password)
     if (action === 'reset-password') {
-      const { email, code, newPassword } = body;
-      if (!email || !code || !newPassword || newPassword.length < 6) {
-        return NextResponse.json(
-          { error: 'All fields required. Password must be at least 6 characters.' },
-          { status: 400 }
-        );
+      const parsed = ResetPasswordSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
+      const { email, code, newPassword } = parsed.data;
 
       const resetRecord = await db.passwordResetToken.findFirst({
         where: {
@@ -247,7 +271,8 @@ export async function POST(req: Request) {
     // 7. UPDATE THEME SETTINGS
     if (action === 'update-settings') {
       const currentUser = await getCurrentUser();
-      const { colorTheme, fontTheme } = body;
+      const parsed = UpdateSettingsSchema.safeParse(body);
+      const { colorTheme, fontTheme } = parsed.success ? parsed.data : body;
 
       if (currentUser) {
         await db.user.update({

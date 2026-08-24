@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { db } from '@/lib/db';
 import { getCurrentUser, getOrCreateGuestId } from '@/lib/auth';
+
+// ─── Zod Schemas ─────────────────────────────────────────────────────────────
+
+const CreateNoteSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
+  content: z.string().min(1, 'Content is required').max(50_000, 'Content must be 50,000 characters or fewer'),
+  tags: z.array(z.string().max(50)).max(20).optional().default([]),
+  isArchived: z.boolean().optional().default(false),
+});
+
 
 const INITIAL_DEMO_NOTES = [
   {
@@ -139,32 +150,27 @@ export async function POST(req: Request) {
     const currentUser = await getCurrentUser();
     const ownerId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
-    const { title, content, tags, isArchived } = body;
 
-    if (!title || !title.trim()) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    const parsed = CreateNoteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
-
-    if (!content || !content.trim()) {
-      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
-    }
-
-    const parsedTags = Array.isArray(tags) ? tags : [];
+    const { title, content, tags, isArchived } = parsed.data;
 
     const note = await db.note.create({
       data: {
         userId: ownerId,
         title: title.trim(),
         content: content.trim(),
-        tags: JSON.stringify(parsedTags),
-        isArchived: Boolean(isArchived),
+        tags: JSON.stringify(tags),
+        isArchived,
       },
     });
 
     return NextResponse.json({
       note: {
         ...note,
-        tags: parsedTags,
+        tags,
       },
     });
   } catch (error) {

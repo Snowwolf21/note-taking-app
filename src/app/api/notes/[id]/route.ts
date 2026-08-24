@@ -1,6 +1,21 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { db } from '@/lib/db';
 import { getCurrentUser, getOrCreateGuestId } from '@/lib/auth';
+
+// ─── Zod Schemas ─────────────────────────────────────────────────────────────
+
+const UpdateNoteSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be 200 characters or fewer'),
+  content: z.string().min(1, 'Content is required').max(50_000, 'Content must be 50,000 characters or fewer'),
+  tags: z.array(z.string().max(50)).max(20).default([]),
+  isArchived: z.boolean().optional(),
+});
+
+const ArchiveNoteSchema = z.object({
+  isArchived: z.boolean({ message: 'isArchived must be a boolean' }),
+});
+
 
 export async function GET(
   req: Request,
@@ -44,15 +59,11 @@ export async function PUT(
     const currentUser = await getCurrentUser();
     const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
-    const { title, content, tags, isArchived } = body;
-
-    if (!title || !title.trim()) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    const parsed = UpdateNoteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
-
-    if (!content || !content.trim()) {
-      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
-    }
+    const { title, content, tags, isArchived } = parsed.data;
 
     const existing = await db.note.findUnique({ where: { id } });
     if (!existing) {
@@ -63,22 +74,20 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const parsedTags = Array.isArray(tags) ? tags : [];
-
     const updatedNote = await db.note.update({
       where: { id },
       data: {
         title: title.trim(),
         content: content.trim(),
-        tags: JSON.stringify(parsedTags),
-        ...(isArchived !== undefined ? { isArchived: Boolean(isArchived) } : {}),
+        tags: JSON.stringify(tags),
+        ...(isArchived !== undefined ? { isArchived } : {}),
       },
     });
 
     return NextResponse.json({
       note: {
         ...updatedNote,
-        tags: parsedTags,
+        tags,
       },
     });
   } catch (error) {
@@ -96,7 +105,12 @@ export async function PATCH(
     const currentUser = await getCurrentUser();
     const expectedId = currentUser ? currentUser.id : await getOrCreateGuestId();
     const body = await req.json();
-    const { isArchived } = body;
+
+    const parsed = ArchiveNoteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { isArchived } = parsed.data;
 
     const existing = await db.note.findUnique({ where: { id } });
     if (!existing) {
