@@ -76,15 +76,14 @@ export function useNotes() {
     queryFn: () => fetchNotes(activeView, activeTag, searchQuery),
   });
 
-  // Keep selectedNoteId valid whenever the notes list changes
+  // Clear selectedNoteId only if the selected note was deleted (no longer in the list).
+  // Never auto-select a note — the user must click to open one.
   useEffect(() => {
-    if (notes.length > 0) {
+    if (selectedNoteId !== null) {
       const exists = notes.some((n) => n.id === selectedNoteId);
       if (!exists) {
-        setSelectedNoteId(notes[0].id);
+        setSelectedNoteId(null);
       }
-    } else if (notes.length === 0 && selectedNoteId !== null) {
-      setSelectedNoteId(null);
     }
   }, [notes, selectedNoteId, setSelectedNoteId]);
 

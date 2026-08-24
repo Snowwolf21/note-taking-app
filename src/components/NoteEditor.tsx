@@ -3,9 +3,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Save,
-  Archive,
-  ArchiveRestore,
-  Trash2,
   Tag as TagIcon,
   X,
   Plus,
@@ -170,6 +167,14 @@ export function NoteEditor({
     };
   }, [content]);
 
+  // Dirty tracking: Save is only enabled when content differs from the saved note
+  const isDirty = useMemo(() => {
+    if (isNewNoteMode) return true; // new notes are always "dirty"
+    if (!note) return false;
+    const tagsChanged = JSON.stringify(tags) !== JSON.stringify(Array.isArray(note.tags) ? note.tags : []);
+    return title !== (note.title || '') || content !== (note.content || '') || tagsChanged;
+  }, [isNewNoteMode, note, title, content, tags]);
+
   if (!note && !isNewNoteMode) {
     return (
       <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center bg-(--bg-main) space-y-4" aria-label="No Note Selected">
@@ -208,7 +213,7 @@ export function NoteEditor({
         {/* Left: Hamburger (mobile/tablet) + Mode Switcher */}
         <div className="flex items-center space-x-2">
           {/* Hamburger Menu — opens sidebar on mobile/tablet */}
-          {onOpenMobileSidebar && (
+          {/* {onOpenMobileSidebar && (
             <button
               onClick={onOpenMobileSidebar}
               className="p-1.5 rounded-lg text-(--text-main) bg-(--bg-card) border border-(--border-color) hover:bg-(--bg-surface-hover) lg:hidden btn-interactive focus-ring shadow-xs flex items-center justify-center shrink-0"
@@ -217,20 +222,29 @@ export function NoteEditor({
             >
               <Menu className="w-5 h-5 text-(--primary)" />
             </button>
-          )}
+          )} */}
 
           {/* Edit / Preview Mode Switcher */}
           <div className="flex items-center p-1 bg-(--bg-card) border border-(--border-color) rounded-xl">
             <button
-              onClick={() => setMode('edit')}
+              onClick={() => {
+                if (isGuest) {
+                  onOpenAuth?.();
+                  return;
+                }
+                setMode('edit');
+              }}
               className={`px-2.5 py-1 text-xs font-semibold rounded-lg flex items-center space-x-1 btn-interactive focus-ring ${
-                mode === 'edit'
+                mode === 'edit' && !isGuest
                   ? 'bg-(--primary) text-(--primary-contrast) shadow-xs'
+                  : isGuest
+                  ? 'text-(--text-muted) hover:text-(--primary) cursor-pointer'
                   : 'text-(--text-muted) hover:text-(--text-main)'
               }`}
+              title={isGuest ? 'Sign in to edit notes' : 'Switch to edit mode'}
             >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Edit</span>
+              {isGuest ? <Lock className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{isGuest ? 'Sign In' : 'Edit'}</span>
             </button>
             <button
               onClick={() => setMode('preview')}
@@ -246,52 +260,23 @@ export function NoteEditor({
           </div>
         </div>
 
-        {/* Right: Action Buttons (Archive, Delete, Save) */}
-        <div className="flex items-center space-x-1.5">
-          {/* Archive / Unarchive — icon only on mobile */}
-          {note?.id && (
-            <button
-              onClick={() => {
-                if (isGuest) { onOpenAuth?.(); return; }
-                onArchiveToggle(note.id, isArchived);
-              }}
-              className={`p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-xl border flex items-center space-x-1.5 btn-interactive focus-ring ${
-                isArchived
-                  ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
-                  : 'bg-(--bg-card) text-(--text-muted) border-(--border-color) hover:text-(--text-main) hover:bg-(--bg-surface-hover)'
-              }`}
-              title={isArchived ? 'Restore Note' : 'Archive Note'}
-            >
-              {isArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
-              <span className="hidden lg:inline">{isArchived ? 'Unarchive' : 'Archive'}</span>
-            </button>
-          )}
-
-          {/* Delete Note — icon only on mobile */}
-          {note?.id && (
-            <button
-              onClick={() => {
-                if (isGuest) { onOpenAuth?.(); return; }
-                onDeleteNote(note.id);
-              }}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 btn-interactive focus-ring flex items-center space-x-1.5"
-              title="Delete Note"
-            >
-              <Trash2 className="w-4 h-4" />
-              <span className="hidden lg:inline">Delete</span>
-            </button>
-          )}
-
-          {/* Save Note — always visible in top bar, icon only on mobile, icon+text on lg+ */}
+        {/* Right: Save Note only — Archive & Delete moved to note cards in NoteList */}
+        <div className="flex items-center">
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="flex p-1.5 sm:px-4 sm:py-1.5 text-xs font-bold bg-(--primary) text-(--primary-contrast) rounded-xl hover:opacity-90 btn-interactive focus-ring shadow-sm items-center space-x-1.5 disabled:opacity-50"
-            title="Save changes (Cmd+S)"
-            aria-label={saving ? 'Saving note...' : 'Save Note'}
+            disabled={saving || !isDirty}
+            className={`flex p-1.5 sm:px-4 sm:py-1.5 text-xs font-bold rounded-xl btn-interactive focus-ring shadow-sm items-center space-x-1.5 transition-all ${
+              isDirty
+                ? 'bg-(--primary) text-(--primary-contrast) hover:opacity-90'
+                : 'bg-(--bg-card) text-(--text-muted) border border-(--border-color) cursor-not-allowed'
+            } disabled:opacity-50`}
+            title={isDirty ? 'Save changes (Cmd+S)' : 'No changes to save'}
+            aria-label={saving ? 'Saving note...' : isDirty ? 'Save Note' : 'No changes'}
           >
             <Save className="w-4 h-4" />
-            <span className="hidden lg:inline">{saving ? 'Saving...' : 'Save Note'}</span>
+            <span className="hidden lg:inline">
+              {saving ? 'Saving...' : isDirty ? 'Save' : 'No changes'}
+            </span>
           </button>
         </div>
       </div>
@@ -416,7 +401,7 @@ export function NoteEditor({
                 }}
                 aria-invalid={contentError ? 'true' : 'false'}
                 aria-describedby={contentError ? 'content-error-msg' : undefined}
-                className={`w-full min-h-[200px] md:min-h-[360px] p-4 bg-(--bg-surface) border rounded-2xl text-sm leading-relaxed text-(--text-main) placeholder-(--text-muted)/50 focus-ring resize-y font-mono ${
+                className={`w-full min-h-64 md:min-h-96 p-4 bg-(--bg-surface) border rounded-2xl text-sm leading-relaxed text-(--text-main) placeholder-(--text-muted)/50 focus-ring resize-y font-mono ${
                   contentError ? 'border-red-500' : 'border-(--border-color)'
                 }`}
               />

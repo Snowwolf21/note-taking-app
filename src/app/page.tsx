@@ -213,6 +213,11 @@ export default function Home() {
         onNewNote={handleNewNote}
         onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         isNewNoteMode={isNewNoteMode}
+        onArchiveNote={(id, currentArchived) => handleArchiveToggle(id, currentArchived)}
+        onDeleteNote={(id) => {
+          if (!user) { openAuthModal('login'); return; }
+          setNoteToDeleteId(id);
+        }}
       />
 
       {/* 3. Right Main Note Editor / Reader Panel */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Search, Plus, Tag, Calendar, Archive, FileText, Menu, X } from 'lucide-react';
+import { Search, Plus, Tag, Calendar, Archive, ArchiveRestore, Trash2, FileText, Menu } from 'lucide-react';
 
 export interface NoteItem {
   id: string;
@@ -26,6 +26,8 @@ interface NoteListProps {
   onNewNote: () => void;
   onOpenMobileSidebar: () => void;
   isNewNoteMode?: boolean;
+  onArchiveNote: (id: string, currentArchived: boolean) => void;
+  onDeleteNote: (id: string) => void;
 }
 
 export function NoteList({
@@ -41,6 +43,8 @@ export function NoteList({
   onNewNote,
   onOpenMobileSidebar,
   isNewNoteMode = false,
+  onArchiveNote,
+  onDeleteNote,
 }: NoteListProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -222,50 +226,86 @@ export function NoteList({
         ) : (
           notes.map((note) => {
             const isSelected = selectedNoteId === note.id;
-            const snippet = note.content.replace(/[#*`_]/g, '').slice(0, 90);
+            const snippet = note.content.replace(/[#*`_]/g, '').slice(0, 80);
 
             return (
-              <button
+              <div
                 key={note.id}
-                onClick={() => onSelectNote(note.id)}
-                className={`w-full text-left p-3.5 rounded-xl border btn-interactive focus-ring space-y-2 ${
+                className={`group relative rounded-xl border transition-all ${
                   isSelected
-                    ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary) shadow-sm font-semibold'
+                    ? 'border-(--primary) bg-(--primary)/10 ring-1 ring-(--primary) shadow-sm'
                     : 'border-(--border-color) bg-(--bg-card) hover:bg-(--bg-surface-hover)'
                 }`}
-                aria-selected={isSelected}
+                aria-label={note.title || 'Untitled Note'}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-bold text-sm text-(--text-main) line-clamp-1">
-                    {note.title || 'Untitled Note'}
-                  </h3>
-                  {note.isArchived && (
-                    <span className="px-1.5 py-0.5 text-[10px] uppercase font-bold rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 shrink-0">
-                      Archived
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-xs text-(--text-muted) line-clamp-2 leading-relaxed">
-                  {snippet || 'Empty note content...'}
-                </p>
-
-                <div className="flex items-center justify-between text-[11px] text-(--text-muted) pt-1">
-                  <div className="flex items-center space-x-1.5">
-                    <Calendar className="w-3 h-3" />
-                    <span>{formatDate(note.updatedAt)}</span>
+                {/* Clickable note body */}
+                <button
+                  onClick={() => onSelectNote(note.id)}
+                  className="w-full text-left p-3.5 space-y-2 focus-ring rounded-xl pr-16"
+                  aria-selected={isSelected}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className={`text-sm text-(--text-main) line-clamp-1 ${ isSelected ? 'font-bold' : 'font-semibold' }`}>
+                      {note.title || 'Untitled Note'}
+                    </h3>
+                    {note.isArchived && (
+                      <span className="px-1.5 py-0.5 text-[10px] uppercase font-bold rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 shrink-0">
+                        Archived
+                      </span>
+                    )}
                   </div>
 
-                  {Array.isArray(note.tags) && note.tags.length > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <Tag className="w-3 h-3 text-(--primary)" />
-                      <span className="truncate max-w-30 font-medium text-(--text-main)">
-                        {note.tags.join(', ')}
-                      </span>
+                  <p className="text-xs text-(--text-muted) line-clamp-2 leading-relaxed">
+                    {snippet || 'Empty note content...'}
+                  </p>
+
+                  <div className="flex items-center justify-between text-[11px] text-(--text-muted) pt-1">
+                    <div className="flex items-center space-x-1.5">
+                      <Calendar className="w-3 h-3" />
+                      <span>{formatDate(note.updatedAt)}</span>
                     </div>
-                  )}
+                    {Array.isArray(note.tags) && note.tags.length > 0 && (
+                      <div className="flex items-center space-x-1">
+                        <Tag className="w-3 h-3 text-(--primary)" />
+                        <span className="truncate max-w-24 font-medium text-(--text-main)">
+                          {note.tags.join(', ')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Action buttons — visible on hover or when selected */}
+                <div className={`absolute top-2.5 right-2 flex flex-col gap-1 transition-opacity ${
+                  isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'
+                }`}>
+                  {/* Archive / Unarchive */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onArchiveNote(note.id, note.isArchived); }}
+                    className={`p-1.5 rounded-lg border btn-interactive focus-ring ${
+                      note.isArchived
+                        ? 'bg-amber-500/15 text-amber-500 border-amber-500/30 hover:bg-amber-500/25'
+                        : 'bg-(--bg-surface) text-(--text-muted) border-(--border-color) hover:text-amber-500 hover:border-amber-500/40'
+                    }`}
+                    title={note.isArchived ? 'Unarchive note' : 'Archive note'}
+                    aria-label={note.isArchived ? 'Unarchive note' : 'Archive note'}
+                  >
+                    {note.isArchived
+                      ? <ArchiveRestore className="w-3 h-3 md:w-4 md:h-4" />
+                      : <Archive className="w-3 h-3 md:w-4 md:h-4" />}
+                  </button>
+
+                  {/* Delete */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDeleteNote(note.id); }}
+                    className="p-1.5 rounded-lg border bg-(--danger)/50 text-(--danger-contrast) border-(--danger) hover:bg-(--danger-hover) hover:border-(--danger-hover) btn-interactive focus-ring"
+                    title="Delete note"
+                    aria-label="Delete note"
+                  >
+                    <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                  </button>
                 </div>
-              </button>
+              </div>
             );
           })
         )}
