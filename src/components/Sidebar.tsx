@@ -5,13 +5,11 @@ import {
   FileText,
   Archive,
   Tag as TagIcon,
-  Settings,
   Plus,
   User,
   LogOut,
   PenTool,
   Key,
-  FolderOpen,
 } from 'lucide-react';
 
 interface SidebarProps {
