@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
   const mutatingMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
   
   if (mutatingMethods.includes(method)) {
-    const hasSessionCookie = request.cookies.has('auth_token');
+    const hasSessionCookie = request.cookies.has('auth_token') || request.cookies.has('guest_token');
     
     // First-party browser sessions authenticated via cookies are trusted and bypass HMAC signature check
     if (!hasSessionCookie) {
