@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { randomInt } from 'crypto';
+import { randomInt, createHash } from 'crypto';
 import { db } from '@/lib/db';
 import {
   hashPassword,
@@ -216,11 +216,15 @@ export async function POST(req: Request) {
 
       const token = randomInt(100000, 999999).toString(); // Cryptographically secure 6-digit PIN code
       const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
+      const hashedToken = createHash('sha256').update(token).digest('hex');
+
+      // Log plaintext PIN in console for dev testing
+      console.log(`[PASSWORD RESET] Email: ${user.email} | Verification Code: ${token}`);
 
       await db.passwordResetToken.create({
         data: {
           email: user.email,
-          token,
+          token: hashedToken,
           expiresAt,
           userId: user.id,
         },
@@ -239,10 +243,12 @@ export async function POST(req: Request) {
       }
       const { email, code, newPassword } = parsed.data;
 
+      const hashedInput = createHash('sha256').update(code.trim()).digest('hex');
+
       const resetRecord = await db.passwordResetToken.findFirst({
         where: {
           email: email.toLowerCase().trim(),
-          token: code.trim(),
+          token: hashedInput,
           expiresAt: { gt: new Date() },
         },
       });
